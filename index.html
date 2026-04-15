@@ -4631,7 +4631,7 @@ var patients = {
       { name: "BMI", value: 28.6, unit: "kg/m²", stdLow: 18.5, stdHigh: 24.0, stdLabel: "18.5~24.0" },
       { name: "体重", value: 84.7, unit: "kg", stdLow: 62.0, stdHigh: 69.0, stdLabel: "62.0~69.0" },
       { name: "体脂百分比", value: 26.8, unit: "%", stdLow: 15.0, stdHigh: 20.0, stdLabel: "15.0~20.0" },
-      { name: "血压", value: "148/96", unit: "mmHg", stdLow: 0, stdHigh: 0, stdLabel: "120/80", status: "high", statusText: "偏高" },
+      { name: "血压", type: "bp", systolic: 148, diastolic: 96, unit: "mmHg", stdSystolic: 120, stdDiastolic: 80, stdLabel: "120/80", status: "high", statusText: "偏高" },
       { name: "腰围", value: 92, unit: "cm", stdLow: 0, stdHigh: 90, stdLabel: "<90", status: "high", statusText: "偏高" },
       { name: "内脏脂肪面积", value: 126, unit: "cm²", stdLow: 0, stdHigh: 100, stdLabel: "<100", status: "high", statusText: "偏高" }
     ],
@@ -4847,7 +4847,7 @@ var patients = {
       { name: "BMI", value: 26.0, unit: "kg/m²", stdLow: 18.5, stdHigh: 24.0, stdLabel: "18.5~24.0" },
       { name: "体重", value: 68.3, unit: "kg", stdLow: 49.0, stdHigh: 55.0, stdLabel: "49.0~55.0" },
       { name: "体脂百分比", value: 32.1, unit: "%", stdLow: 20.0, stdHigh: 25.0, stdLabel: "20.0~25.0" },
-      { name: "血压", value: "115/72", unit: "mmHg", stdLow: 0, stdHigh: 0, stdLabel: "120/80", status: "normal", statusText: "正常" },
+      { name: "血压", type: "bp", systolic: 115, diastolic: 72, unit: "mmHg", stdSystolic: 120, stdDiastolic: 80, stdLabel: "120/80", status: "normal", statusText: "正常" },
       { name: "腰围", value: 80, unit: "cm", stdLow: 0, stdHigh: 85, stdLabel: "<85", status: "normal", statusText: "正常" },
       { name: "内脏脂肪面积", value: 72, unit: "cm²", stdLow: 0, stdHigh: 100, stdLabel: "<100", status: "normal", statusText: "正常" }
     ],
@@ -5029,7 +5029,7 @@ var patients = {
       { name: "BMI", value: 30.2, unit: "kg/m²", stdLow: 18.5, stdHigh: 24.0, stdLabel: "18.5~24.0" },
       { name: "体重", value: 92.5, unit: "kg", stdLow: 63.0, stdHigh: 70.0, stdLabel: "63.0~70.0" },
       { name: "体脂百分比", value: 29.5, unit: "%", stdLow: 15.0, stdHigh: 20.0, stdLabel: "15.0~20.0" },
-      { name: "血压", value: "138/88", unit: "mmHg", stdLow: 0, stdHigh: 0, stdLabel: "120/80", status: "high", statusText: "偏高" },
+      { name: "血压", type: "bp", systolic: 138, diastolic: 88, unit: "mmHg", stdSystolic: 120, stdDiastolic: 80, stdLabel: "120/80", status: "high", statusText: "偏高" },
       { name: "腰围", value: 102, unit: "cm", stdLow: 0, stdHigh: 90, stdLabel: "<90", status: "high", statusText: "偏高" },
       { name: "内脏脂肪面积", value: 168, unit: "cm²", stdLow: 0, stdHigh: 100, stdLabel: "<100", status: "high", statusText: "严重偏高" }
     ],
@@ -5461,6 +5461,49 @@ function buildBarChart(items) {
   var html = '<div class="bar-chart-container">';
   for (var i = 0; i < items.length; i++) {
     var item = items[i];
+
+    // ===== 血压拆行分支：高压、低压各一行 =====
+    if (item.type === "bp") {
+      var sysVal = item.systolic || 0;
+      var diaVal = item.diastolic || 0;
+      var sysStd = item.stdSystolic || 120;
+      var diaStd = item.stdDiastolic || 80;
+      var sysStatus = sysVal <= sysStd ? "normal" : "high";
+      var diaStatus = diaVal <= diaStd ? "normal" : "high";
+      var bpMax = 200; // 血压统一上限，保证行间可比
+      var sysPct = Math.min((sysVal / bpMax) * 100, 100);
+      var sysStdPct = Math.min((sysStd / bpMax) * 100, 100);
+      var diaPct = Math.min((diaVal / bpMax) * 100, 100);
+      var diaStdPct = Math.min((diaStd / bpMax) * 100, 100);
+
+      // 渲染两行：高压行
+      html += '<div class="bar-chart-row">' +
+        '<div class="bar-chart-label">' + item.name + '（高压）</div>' +
+        '<div class="bar-chart-track">' +
+          '<div class="bar-chart-range" style="left:0;width:' + sysStdPct + '%;"></div>' +
+          '<div class="bar-chart-fill" style="width:' + sysPct + '%;background:' + (sysStatus === "normal" ? "var(--color-success)" : "var(--color-error)") + ';"></div>' +
+          '<div class="bar-chart-marker" style="left:' + sysStdPct + '%;" title="标准:' + sysStd + '"></div>' +
+        '</div>' +
+        '<div class="bar-chart-value"><span class="bar-chart-val-num" style="color:' + (sysStatus === "normal" ? "var(--color-success)" : "var(--color-error)") + ';">' + sysVal + '</span><span class="bar-chart-val-unit"> mmHg</span></div>' +
+        '<div class="bar-chart-std">标准: ' + sysStd + '</div>' +
+        '<div class="bar-chart-status"><span class="bar-status-dot" style="background:' + (sysStatus === "normal" ? "var(--color-success)" : "var(--color-error)") + ';"></span>' + (sysStatus === "normal" ? "正常" : "偏高") + '</div>' +
+      '</div>';
+      // 低压行
+      html += '<div class="bar-chart-row" style="border-top:1px dashed var(--color-gray-200);padding-top:8px;margin-top:-2px;">' +
+        '<div class="bar-chart-label">' + item.name + '（低压）</div>' +
+        '<div class="bar-chart-track">' +
+          '<div class="bar-chart-range" style="left:0;width:' + diaStdPct + '%;"></div>' +
+          '<div class="bar-chart-fill" style="width:' + diaPct + '%;background:' + (diaStatus === "normal" ? "var(--color-success)" : "var(--color-error)") + ';"></div>' +
+          '<div class="bar-chart-marker" style="left:' + diaStdPct + '%;" title="标准:' + diaStd + '"></div>' +
+        '</div>' +
+        '<div class="bar-chart-value"><span class="bar-chart-val-num" style="color:' + (diaStatus === "normal" ? "var(--color-success)" : "var(--color-error)") + ';">' + diaVal + '</span><span class="bar-chart-val-unit"> mmHg</span></div>' +
+        '<div class="bar-chart-std">标准: ' + diaStd + '</div>' +
+        '<div class="bar-chart-status"><span class="bar-status-dot" style="background:' + (diaStatus === "normal" ? "var(--color-success)" : "var(--color-error)") + ';"></span>' + (diaStatus === "normal" ? "正常" : "偏高") + '</div>' +
+      '</div>';
+      continue;
+    }
+
+    // ===== 普通指标分支 =====
     var val = typeof item.value === "number" ? item.value : 0;
     var status, statusText, barColor;
 

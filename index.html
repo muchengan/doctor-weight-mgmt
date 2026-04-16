@@ -2145,6 +2145,475 @@ input, select, textarea { font-family: inherit; outline: none; }
 }
 
 /* ============================================
+   中医体质评估
+   ============================================ */
+
+.tcm-welcome {
+  text-align: center;
+  padding: 60px 20px;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.tcm-welcome-icon {
+  font-size: 56px;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.tcm-welcome h3 {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-gray-900);
+  margin-bottom: 12px;
+}
+
+.tcm-welcome p {
+  font-size: 14px;
+  color: var(--color-gray-500);
+  line-height: 1.7;
+  margin-bottom: 32px;
+}
+
+.tcm-start-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 36px;
+  background: var(--color-primary-500);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-xl);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tcm-start-btn:hover {
+  background: var(--color-primary-600);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 34, 217, 0.3);
+}
+
+/* 进度条 */
+.tcm-progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 16px 20px;
+  background: var(--color-gray-50);
+  border-radius: var(--radius-xl);
+}
+
+.tcm-progress-bar {
+  flex: 1;
+  height: 6px;
+  background: var(--color-gray-200);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.tcm-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary-500), var(--color-primary-400));
+  border-radius: var(--radius-full);
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tcm-progress-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-gray-600);
+  white-space: nowrap;
+}
+
+/* 题目卡片 */
+.tcm-question-card {
+  background: #fff;
+  border-radius: var(--radius-xl);
+  padding: 28px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  border: 1px solid var(--color-gray-100);
+}
+
+.tcm-q-number {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-primary-500);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.tcm-q-type-tag {
+  display: inline-block;
+  font-size: 11px;
+  padding: 2px 8px;
+  background: rgba(0, 34, 217, 0.06);
+  color: var(--color-primary-500);
+  border-radius: var(--radius-full);
+  margin-left: 8px;
+  font-weight: 500;
+}
+
+.tcm-q-text {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--color-gray-900);
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.tcm-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.tcm-option-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  background: var(--color-gray-50);
+  border: 2px solid transparent;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+  font-size: 14px;
+  color: var(--color-gray-700);
+  line-height: 1.4;
+}
+
+.tcm-option-btn:hover {
+  background: var(--color-primary-50);
+  border-color: var(--color-primary-200);
+}
+
+.tcm-option-btn.selected {
+  background: var(--color-primary-50);
+  border-color: var(--color-primary-500);
+  color: var(--color-primary-600);
+  font-weight: 500;
+}
+
+.tcm-option-radio {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--color-gray-300);
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.tcm-option-btn.selected .tcm-option-radio {
+  border-color: var(--color-primary-500);
+  background: var(--color-primary-500);
+}
+
+.tcm-option-btn.selected .tcm-option-radio::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background: #fff;
+  border-radius: 50%;
+}
+
+/* 导航按钮 */
+.tcm-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 24px;
+  gap: 12px;
+}
+
+.tcm-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 24px;
+  border-radius: var(--radius-lg);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.tcm-nav-btn.prev {
+  background: var(--color-gray-100);
+  color: var(--color-gray-600);
+}
+
+.tcm-nav-btn.prev:hover {
+  background: var(--color-gray-200);
+}
+
+.tcm-nav-btn.next {
+  background: var(--color-primary-500);
+  color: #fff;
+}
+
+.tcm-nav-btn.next:hover {
+  background: var(--color-primary-600);
+}
+
+.tcm-nav-btn.next:disabled {
+  background: var(--color-gray-200);
+  color: var(--color-gray-400);
+  cursor: not-allowed;
+}
+
+.tcm-nav-btn.submit {
+  background: #10B981;
+  color: #fff;
+}
+
+.tcm-nav-btn.submit:hover {
+  background: #059669;
+}
+
+/* 结果页 */
+.tcm-result-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.tcm-result-type-icon {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.tcm-result-type-name {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-gray-900);
+  margin-bottom: 4px;
+}
+
+.tcm-result-score-label {
+  font-size: 14px;
+  color: var(--color-gray-500);
+}
+
+.tcm-result-score {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--color-primary-500);
+}
+
+.tcm-result-scores {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+
+.tcm-result-score-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--color-gray-50);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-gray-100);
+}
+
+.tcm-result-score-row.primary {
+  background: var(--color-primary-50);
+  border-color: var(--color-primary-200);
+}
+
+.tcm-score-label {
+  font-size: 13px;
+  color: var(--color-gray-600);
+  flex: 1;
+}
+
+.tcm-score-val {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-gray-900);
+}
+
+.tcm-score-bar {
+  width: 60px;
+  height: 6px;
+  background: var(--color-gray-200);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.tcm-score-bar-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 0.6s ease;
+}
+
+.tcm-result-desc {
+  padding: 20px;
+  background: var(--color-gray-50);
+  border-radius: var(--radius-xl);
+  margin-bottom: 20px;
+}
+
+.tcm-result-desc h4 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-gray-800);
+  margin-bottom: 10px;
+}
+
+.tcm-result-desc p {
+  font-size: 13px;
+  color: var(--color-gray-600);
+  line-height: 1.8;
+}
+
+.tcm-result-tips {
+  padding: 20px;
+  background: #ECFDF5;
+  border-radius: var(--radius-xl);
+  border: 1px solid #A7F3D0;
+}
+
+.tcm-result-tips h4 {
+  font-size: 15px;
+  font-weight: 700;
+  color: #065F46;
+  margin-bottom: 10px;
+}
+
+.tcm-result-tips li {
+  font-size: 13px;
+  color: #047857;
+  line-height: 1.8;
+  padding-left: 4px;
+}
+
+.tcm-result-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 28px;
+  justify-content: center;
+}
+
+.tcm-retry-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 24px;
+  background: var(--color-gray-100);
+  color: var(--color-gray-700);
+  border: none;
+  border-radius: var(--radius-lg);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tcm-retry-btn:hover {
+  background: var(--color-gray-200);
+}
+
+@media (max-width: 640px) {
+  .tcm-options { grid-template-columns: 1fr; }
+  .tcm-result-scores { grid-template-columns: 1fr; }
+}
+
+/* 完整档案 - 中医体质 Tab */
+.fr-tcm-header {
+  text-align: center;
+  padding: var(--space-6) 0 var(--space-4);
+}
+.fr-tcm-type-icon {
+  font-size: 48px;
+  display: block;
+  margin-bottom: var(--space-2);
+}
+.fr-tcm-type-name {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-gray-800);
+}
+.fr-tcm-date {
+  font-size: 12px;
+  color: var(--color-gray-400);
+  margin-top: var(--space-1);
+}
+.fr-tcm-score-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--color-gray-50);
+  border-radius: 12px;
+  padding: var(--space-5) var(--space-6);
+  margin-bottom: var(--space-5);
+}
+.fr-tcm-score-label {
+  font-size: 12px;
+  color: var(--color-gray-500);
+}
+.fr-tcm-score-value {
+  font-size: 36px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+.fr-tcm-score-unit {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--color-gray-400);
+}
+.fr-tcm-score-badge {
+  font-size: 14px;
+  font-weight: 600;
+  padding: 6px 16px;
+  border-radius: 20px;
+}
+.fr-tcm-all-scores {
+  margin-bottom: var(--space-5);
+}
+.fr-tcm-score-row {
+  display: grid;
+  grid-template-columns: 120px 1fr 40px;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+}
+.fr-tcm-score-row.primary .fr-tcm-score-row-label {
+  font-weight: 700;
+}
+.fr-tcm-score-row-label {
+  font-size: 13px;
+  color: var(--color-gray-600);
+}
+.fr-tcm-score-row-bar {
+  height: 8px;
+  background: var(--color-gray-100);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.fr-tcm-score-row-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.fr-tcm-score-row-val {
+  font-size: 13px;
+  color: var(--color-gray-500);
+  text-align: right;
+}
+
+/* ============================================
    响应式适配
    ============================================ */
 
@@ -4511,6 +4980,7 @@ textarea.edit-input {
               <div class="tab-panel" id="panel-fat-ctrl"></div>
               <div class="tab-panel" id="panel-trend"></div>
               <div class="tab-panel" id="panel-inquiry"></div>
+              <div class="tab-panel" id="panel-tcm-assess"></div>
               </div>
 
             </div>
@@ -4585,6 +5055,7 @@ textarea.edit-input {
       <div class="fr-panel" id="fr-panel-med-exam"></div>
       <div class="fr-panel" id="fr-panel-trend"></div>
       <div class="fr-panel" id="fr-panel-prescription"></div>
+      <div class="fr-panel" id="fr-panel-tcm"></div>
     </div>
   </div>
 </div>
@@ -5442,6 +5913,7 @@ function renderPatientCard(key) {
   renderFatCtrlPanel(p);
   renderTrendPanel(p);
   renderInquiryPanel(p);
+  renderTcmAssessPanel(p);
 
   switchTab("weight-ctrl");
 }
@@ -5958,7 +6430,8 @@ document.addEventListener("DOMContentLoaded", function() {
       { tab: "muscle-ctrl", icon: "💪", label: "肌肉控制" },
       { tab: "fat-ctrl", icon: "🧬", label: "脂肪控制" },
       { tab: "trend", icon: "📈", label: "趋势变化" },
-      { tab: "inquiry", icon: "📋", label: "问诊评估" }
+      { tab: "inquiry", icon: "📋", label: "问诊评估" },
+      { tab: "tcm-assess", icon: "🧘", label: "中医体质" }
     ];
     var tabHtml = "";
     for (var t = 0; t < tabDefs.length; t++) {
@@ -6095,6 +6568,7 @@ function renderFullRecord(key) {
   renderFrMedExam(fr);
   renderFrTrendFull(p);
   renderFrPrescription(p);
+  renderFrTcm(p);
 
   // 默认显示基本信息Tab
   switchFrTab("basic");
@@ -6164,7 +6638,8 @@ function renderFrTabs() {
     { tab: "inquiry", icon: "📋", label: "问诊评估" },
     { tab: "med-exam", icon: "🔬", label: "医学检查" },
     { tab: "trend", icon: "📈", label: "趋势变化" },
-    { tab: "prescription", icon: "📝", label: "处方指导" }
+    { tab: "prescription", icon: "📝", label: "处方指导" },
+    { tab: "tcm", icon: "🧘", label: "中医体质" }
   ];
   var html = "";
   for (var i = 0; i < tabDefs.length; i++) {
@@ -7813,6 +8288,378 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   });
 });
+
+// === 中医体质评估题库与逻辑 ===
+var TCM_TYPES = {
+  pinghe:      { name: "平和质",   icon: "🌿", color: "#10B981", desc: "阴阳气血调和，体态适中，面色润泽红润，精力充沛，睡眠良好。是最理想的体质状态，患病较少。", tips: ["保持规律作息，不熬夜", "均衡饮食，不偏食", "适量运动，维持体质", "保持心情舒畅"] },
+  qixu:       { name: "气虚质",   icon: "💨", color: "#F59E0B", desc: "元气不足，气息低弱，容易疲乏，气短懒言，容易出虚汗。抵抗力较差，易患感冒等疾病。", tips: ["多食益气健脾食物（黄芪、山药、大枣）", "避免过度劳累和剧烈运动", "注意保暖，防止外邪侵袭", "适宜散步、太极拳等柔和运动"] },
+  yangxu:      { name: "阳虚质",   icon: "❄️", color: "#3B82F6", desc: "阳气不足，手足不温，畏寒怕冷，精神不振。喜热饮食，吃生冷食物易腹泻。", tips: ["多食温热性食物（羊肉、生姜、桂圆）", "注意保暖，尤其是腰腹和下肢", "多晒太阳，适当进行日光浴", "避免生冷寒凉食物"] },
+  yinxu:       { name: "阴虚质",   icon: "🔥", color: "#EF4444", desc: "阴液亏少，口燥咽干，手足心热，体形偏瘦。常感口渴喜冷饮，大便干燥，易失眠。", tips: ["多食滋阴润燥食物（银耳、百合、梨）", "少食辛辣燥热食物", "避免熬夜，保证充足睡眠", "适宜游泳、慢跑等中等强度运动"] },
+  tanshi:      { name: "痰湿质",   icon: "🌫️", color: "#8B5CF6", desc: "痰湿凝聚，体形肥胖，腹部肥满松软，面色淡黄。口黏苔腻，身重不爽，嗜食肥甘。", tips: ["饮食清淡少油，控制食量", "多食健脾利湿食物（薏米、冬瓜、荷叶）", "加强体育锻炼，增加运动量", "避免甜食、油炸食品"] },
+  shire:       { name: "湿热质",   icon: "🌡️", color: "#F97316", desc: "湿热内蕴，面垢油光，易生痤疮，口苦口干。体形偏胖，心烦懈怠，大便黏滞不畅。", tips: ["多食清热利湿食物（绿豆、苦瓜、芹菜）", "少食辛辣油腻甜食", "保持居住环境通风干燥", "适宜游泳、跑步等运动"] },
+  xueyu:       { name: "血瘀质",   icon: "🩸", color: "#DC2626", desc: "血行不畅，肤色晦暗，色素沉着，容易出现瘀斑。口唇暗淡，眼眶暗黑，女性多见痛经。", tips: ["多食活血化瘀食物（山楂、红花、黑豆）", "保持情绪开朗，避免久坐不动", "适宜跑步、舞蹈等有氧运动", "睡前可热水泡脚促进血液循环"] },
+  qiyu:        { name: "气郁质",   icon: "😔", color: "#6366F1", desc: "气机郁滞，神情抑郁，情感脆弱，烦闷不乐。多愁善感，胸胁胀满，善叹息，咽中如有异物梗阻。", tips: ["多参加社交活动，户外运动", "多食行气解郁食物（玫瑰花、佛手、柑橘）", "听音乐、阅读等调节情绪", "适宜跑步、登山等运动舒展身心"] },
+  tebing:      { name: "特禀质",   icon: "⚡", color: "#EC4899", desc: "先天禀赋不足或过敏体质为主。对季节变化适应能力差，易引发过敏反应，如荨麻疹、哮喘等。", tips: ["避免接触过敏原", "饮食清淡，少食辛辣刺激", "保持居室清洁，通风良好", "循序渐进增强体质，不宜过度运动"] }
+};
+
+// 27题完整题库，每种体质3题，选项分值 1/2/3/4/5
+var TCM_QUESTIONS = [
+  // —— 平和质 (3题) ——
+  { id:1,  type:"pinghe", text:"您精力充沛吗？", opts:["没有","偶尔有","时有","经常","总是"] },
+  { id:2,  type:"pinghe", text:"您容易感到疲乏吗？（反向题，1=精力好）", opts:["总是","经常","时有","偶尔有","没有"], reverse:true },
+  { id:3,  type:"pinghe", text:"您睡眠质量好吗？", opts:["没有","偶尔有","时有","经常","总是"] },
+
+  // —— 气虚质 (3题) ——
+  { id:4,  type:"qixu", text:"您容易感到疲乏吗？", opts:["没有","偶尔有","时有","经常","总是"] },
+  { id:5,  type:"qixu", text:"您容易气短（呼吸短促、接不上气）吗？", opts:["没有","偶尔有","时有","经常","总是"] },
+  { id:6,  type:"qixu", text:"您容易心慌吗？", opts:["没有","偶尔有","时有","经常","总是"] },
+
+  // —— 阳虚质 (3题) ——
+  { id:7,  type:"yangxu", text:"您手脚发凉吗？", opts:["没有","偶尔有","时有","经常","总是"] },
+  { id:8,  type:"yangxu", text:"您胃脘部、背部或腰膝部怕冷吗？", opts:["没有","偶尔有","时有","经常","总是"] },
+  { id:9,  type:"yangxu", text:"您比一般人耐受不了寒冷吗？", opts:["没有","偶尔有","时有","经常","总是"] },
+
+  // —— 阴虚质 (3题) ——
+  { id:10, type:"yinxu", text:"您感到手脚心发热吗？", opts:["没有","偶尔有","时有","经常","总是"] },
+  { id:11, type:"yinxu", text:"您感觉身体、脸上发热吗？", opts:["没有","偶尔有","时有","经常","总是"] },
+  { id:12, type:"yinxu", text:"您口唇干燥吗？", opts:["没有","偶尔有","时有","经常","总是"] },
+
+  // —— 痰湿质 (3题) ——
+  { id:13, type:"tanshi", text:"您感到胸闷或腹部胀满吗？", opts:["没有","偶尔有","时有","经常","总是"] },
+  { id:14, type:"tanshi", text:"您感到身体沉重不轻松或不爽快吗？", opts:["没有","偶尔有","时有","经常","总是"] },
+  { id:15, type:"tanshi", text:"您腹部肥满松软吗？", opts:["没有","偶尔有","时有","经常","总是"] },
+
+  // —— 湿热质 (3题) ——
+  { id:16, type:"shire", text:"您面部或鼻部有油腻感或者油亮发光吗？", opts:["没有","偶尔有","时有","经常","总是"] },
+  { id:17, type:"shire", text:"您易生痤疮或疮疖吗？", opts:["没有","偶尔有","时有","经常","总是"] },
+  { id:18, type:"shire", text:"您感到口苦或嘴里有异味吗？", opts:["没有","偶尔有","时有","经常","总是"] },
+
+  // —— 血瘀质 (3题) ——
+  { id:19, type:"xueyu", text:"您皮肤常在不知不觉中出现青紫瘀斑吗？", opts:["没有","偶尔有","时有","经常","总是"] },
+  { id:20, type:"xueyu", text:"您两颧部有细微红丝吗？", opts:["没有","偶尔有","时有","经常","总是"] },
+  { id:21, type:"xueyu", text:"您身体上有哪里疼痛吗？", opts:["没有","偶尔有","时有","经常","总是"] },
+
+  // —— 气郁质 (3题) ——
+  { id:22, type:"qiyu", text:"您感到闷闷不乐、情绪低沉吗？", opts:["没有","偶尔有","时有","经常","总是"] },
+  { id:23, type:"qiyu", text:"您容易精神紧张、焦虑不安吗？", opts:["没有","偶尔有","时有","经常","总是"] },
+  { id:24, type:"qiyu", text:"您多愁善感、感情脆弱吗？", opts:["没有","偶尔有","时有","经常","总是"] },
+
+  // —— 特禀质 (3题) ——
+  { id:25, type:"tebing", text:"您没有感冒也会打喷嚏吗？", opts:["没有","偶尔有","时有","经常","总是"] },
+  { id:26, type:"tebing", text:"您没有感冒也会鼻塞、流鼻涕吗？", opts:["没有","偶尔有","时有","经常","总是"] },
+  { id:27, type:"tebing", text:"您有因季节变化、温度变化或异味引起的咳喘吗？", opts:["没有","偶尔有","时有","经常","总是"] }
+];
+
+// 抽题算法：9种体质各抽1题 = 9题，再从剩余18题随机抽1题 = 10题
+function tcmSelectQuestions() {
+  var typeKeys = Object.keys(TCM_TYPES); // 9种
+  var byType = {};
+  typeKeys.forEach(function(k) { byType[k] = []; });
+  TCM_QUESTIONS.forEach(function(q) { byType[q.type].push(q); });
+
+  var selected = [];
+  var remaining = [];
+
+  // 每种体质随机抽1题
+  typeKeys.forEach(function(k) {
+    var arr = byType[k];
+    var idx = Math.floor(Math.random() * arr.length);
+    selected.push(arr[idx]);
+    // 剩余题目放入池子
+    arr.forEach(function(q, i) { if (i !== idx) remaining.push(q); });
+  });
+
+  // 从剩余18题中随机抽1题
+  var extra = Math.floor(Math.random() * remaining.length);
+  selected.push(remaining[extra]);
+
+  // 洗牌打乱顺序
+  for (var i = selected.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = selected[i]; selected[i] = selected[j]; selected[j] = tmp;
+  }
+
+  return selected;
+}
+
+// 计算体质得分
+function tcmCalcScores(questions, answers) {
+  var scores = {};
+  Object.keys(TCM_TYPES).forEach(function(k) { scores[k] = 0; });
+
+  // 先用所有27题的原始转化分累加
+  TCM_QUESTIONS.forEach(function(q) {
+    var ans = answers[q.id];
+    if (ans !== undefined && ans !== null) {
+      var raw = ans + 1; // 0→1, 1→2, 2→3, 3→4, 4→5
+      if (q.reverse) raw = 6 - raw;
+      scores[q.type] += raw;
+    }
+  });
+
+  // 未作答的题计0分，总分按27题计
+  // 标准分 = sum - 9*9 = sum - 81 (减去9种各9分的基础分)
+  // 简化：返回原始转化分总和
+  return scores;
+}
+
+// 判定结果：平和质≥30分判为平和质；否则原始分最高的为偏颇体质
+function tcmJudgeResult(scores) {
+  var types = Object.keys(scores);
+  var maxType = null, maxScore = -1;
+
+  types.forEach(function(t) {
+    if (scores[t] > maxScore) { maxScore = scores[t]; maxType = t; }
+  });
+
+  if (maxType === "pinghe" && scores.pinghe >= 30) {
+    return { primary: "pinghe", isPinghe: true };
+  }
+
+  // 平和质≥30但不是最高 → 平和+偏颇
+  if (scores.pinghe >= 30) {
+    var secondType = null, secondScore = -1;
+    types.forEach(function(t) {
+      if (t !== "pinghe" && scores[t] > secondScore) { secondScore = scores[t]; secondType = t; }
+    });
+    return { primary: secondType || maxType, isPinghe: false };
+  }
+
+  return { primary: maxType, isPinghe: false };
+}
+
+// 中医体质评估渲染
+function renderTcmAssessPanel(p) {
+  var panel = document.getElementById("panel-tcm-assess");
+  if (!panel) return;
+  panel.innerHTML = "";
+
+  // 保存当前患者引用，供子函数回调使用
+  window._tcmPatient = p;
+
+  // 状态：welcome / quiz / result
+  if (!p._tcmState) {
+    p._tcmState = { phase: "welcome", questions: [], currentQ: 0, answers: {} };
+  }
+
+  var st = p._tcmState;
+
+  if (st.phase === "welcome") {
+    renderTcmWelcome(panel, st);
+  } else if (st.phase === "quiz") {
+    renderTcmQuiz(panel, st);
+  } else if (st.phase === "result") {
+    renderTcmResult(panel, st);
+  }
+}
+
+function renderTcmWelcome(panel, st) {
+  panel.innerHTML =
+    '<div class="tcm-welcome">' +
+      '<span class="tcm-welcome-icon">🧘</span>' +
+      '<h3>中医体质评估</h3>' +
+      '<p>基于中医体质量表，通过回答简短的生活习惯和身体感受问题，帮助识别您的中医体质类型。系统每次从27道标准题中随机抽取10道，涵盖9种体质类型，确保评估全面准确。</p>' +
+      '<button class="tcm-start-btn" id="tcm-start">开始评估 →</button>' +
+    '</div>';
+  document.getElementById("tcm-start").onclick = function() {
+    st.questions = tcmSelectQuestions();
+    st.currentQ = 0;
+    st.answers = {};
+    st.phase = "quiz";
+    renderTcmAssessPanel(window._tcmPatient);
+  };
+}
+
+function renderTcmQuiz(panel, st) {
+  var total = st.questions.length;
+  var idx = st.currentQ;
+  var q = st.questions[idx];
+  var typeName = TCM_TYPES[q.type].name;
+  var selected = st.answers[q.id];
+
+  var html =
+    '<div class="tcm-progress">' +
+      '<div class="tcm-progress-bar"><div class="tcm-progress-fill" style="width:' + ((idx / total) * 100) + '%;"></div></div>' +
+      '<span class="tcm-progress-text">第 ' + (idx + 1) + ' / ' + total + ' 题</span>' +
+    '</div>' +
+    '<div class="tcm-question-card">' +
+      '<div class="tcm-q-number">第 ' + (idx + 1) + ' 题<span class="tcm-q-type-tag">' + typeName + '</span></div>' +
+      '<div class="tcm-q-text">' + q.text + '</div>' +
+      '<div class="tcm-options">';
+
+  q.opts.forEach(function(opt, oi) {
+    var sel = (selected === oi) ? ' selected' : '';
+    html += '<button class="tcm-option-btn' + sel + '" data-oi="' + oi + '">' +
+      '<span class="tcm-option-radio"></span>' +
+      '<span>' + opt + '</span>' +
+    '</button>';
+  });
+
+  html += '</div></div>';
+
+  // 导航
+  html += '<div class="tcm-nav">';
+  if (idx > 0) {
+    html += '<button class="tcm-nav-btn prev" id="tcm-prev">← 上一题</button>';
+  } else {
+    html += '<div></div>';
+  }
+
+  if (idx === total - 1) {
+    html += '<button class="tcm-nav-btn submit" id="tcm-submit"' + (selected === undefined ? ' disabled' : '') + '>提交评估</button>';
+  } else {
+    html += '<button class="tcm-nav-btn next" id="tcm-next"' + (selected === undefined ? ' disabled' : '') + '>下一题 →</button>';
+  }
+  html += '</div>';
+
+  panel.innerHTML = html;
+
+  // 选项点击
+  panel.querySelectorAll('.tcm-option-btn').forEach(function(btn) {
+    btn.onclick = function() {
+      var oi = parseInt(this.getAttribute("data-oi"));
+      st.answers[q.id] = oi;
+      renderTcmAssessPanel(window._tcmPatient);
+    };
+  });
+
+  // 上一题
+  var prevBtn = document.getElementById("tcm-prev");
+  if (prevBtn) prevBtn.onclick = function() { st.currentQ--; renderTcmAssessPanel(window._tcmPatient); };
+
+  // 下一题
+  var nextBtn = document.getElementById("tcm-next");
+  if (nextBtn) nextBtn.onclick = function() { st.currentQ++; renderTcmAssessPanel(window._tcmPatient); };
+
+  // 提交
+  var submitBtn = document.getElementById("tcm-submit");
+  if (submitBtn) submitBtn.onclick = function() {
+    st.phase = "result";
+    st.scores = tcmCalcScores(TCM_QUESTIONS, st.answers);
+    st.result = tcmJudgeResult(st.scores);
+
+    // 保存到患者数据
+    var pat = window._tcmPatient;
+    if (pat) {
+      pat.tcmAssessment = {
+        date: new Date().toLocaleDateString("zh-CN"),
+        time: new Date().toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" }),
+        result: st.result,
+        scores: Object.assign({}, st.scores),
+        answers: Object.assign({}, st.answers)
+      };
+    }
+
+    renderTcmAssessPanel(window._tcmPatient);
+  };
+}
+
+function renderTcmResult(panel, st) {
+  var result = st.result;
+  var primary = TCM_TYPES[result.primary];
+  var pScore = st.scores[result.primary];
+
+  var html =
+    '<div class="tcm-result-header">' +
+      '<span class="tcm-result-type-icon">' + primary.icon + '</span>' +
+      '<div class="tcm-result-type-name">' + primary.name + '</div>' +
+      '<div class="tcm-result-score-label">转化总分</div>' +
+      '<div class="tcm-result-score" style="color:' + primary.color + ';">' + pScore + ' 分</div>' +
+    '</div>';
+
+  // 所有体质得分条
+  html += '<div class="tcm-result-scores">';
+  Object.keys(TCM_TYPES).forEach(function(k) {
+    var t = TCM_TYPES[k];
+    var s = st.scores[k] || 0;
+    var isPrimary = (k === result.primary);
+    var pct = Math.min((s / 50) * 100, 100);
+    var barColor = isPrimary ? t.color : '#D1D5DB';
+    html += '<div class="tcm-result-score-row' + (isPrimary ? ' primary' : '') + '">' +
+      '<span class="tcm-score-label">' + t.icon + ' ' + t.name + '</span>' +
+      '<div class="tcm-score-bar"><div class="tcm-score-bar-fill" style="width:' + pct + '%;background:' + barColor + ';"></div></div>' +
+      '<span class="tcm-score-val">' + s + '</span>' +
+    '</div>';
+  });
+  html += '</div>';
+
+  // 体质描述
+  html += '<div class="tcm-result-desc"><h4>📋 体质特征</h4><p>' + primary.desc + '</p></div>';
+
+  // 调养建议
+  html += '<div class="tcm-result-tips"><h4>💡 调养建议</h4><ul>';
+  primary.tips.forEach(function(tip) { html += '<li>' + tip + '</li>'; });
+  html += '</ul></div>';
+
+  // 操作按钮
+  html += '<div class="tcm-result-actions">' +
+    '<button class="tcm-retry-btn" id="tcm-retry">🔄 重新评估</button>' +
+  '</div>';
+
+  panel.innerHTML = html;
+
+  document.getElementById("tcm-retry").onclick = function() {
+    st.phase = "welcome";
+    renderTcmAssessPanel(window._tcmPatient);
+  };
+}
+
+// ========== 完整档案 Tab: 中医体质 ==========
+function renderFrTcm(p) {
+  var panel = document.getElementById("fr-panel-tcm");
+  if (!panel) return;
+
+  var assess = p.tcmAssessment;
+  if (!assess) {
+    panel.innerHTML = '<div class="fr-empty"><div class="fr-empty-icon">🧘</div><div class="fr-empty-text">暂无中医体质评估记录</div><div class="fr-empty-hint">请返回工作台，在「中医体质」Tab 中完成评估</div></div>';
+    return;
+  }
+
+  var primary = TCM_TYPES[assess.result.primary];
+  var pScore = assess.scores[assess.result.primary];
+
+  var html =
+    '<div class="fr-tcm-header">' +
+      '<span class="fr-tcm-type-icon">' + primary.icon + '</span>' +
+      '<div class="fr-tcm-type-name">' + primary.name + '</div>' +
+      '<div class="fr-tcm-date">评估时间：' + assess.date + ' ' + assess.time + '</div>' +
+    '</div>';
+
+  // 得分概览卡片
+  html += '<div class="fr-tcm-score-card">' +
+    '<div class="fr-tcm-score-main">' +
+      '<div class="fr-tcm-score-label">主要体质得分</div>' +
+      '<div class="fr-tcm-score-value" style="color:' + primary.color + ';">' + pScore + ' <span class="fr-tcm-score-unit">分</span></div>' +
+    '</div>' +
+    '<div class="fr-tcm-score-badge" style="background:' + primary.color + '15;color:' + primary.color + ';">' + primary.name + '</div>' +
+  '</div>';
+
+  // 全部体质得分条
+  html += '<div class="fr-tcm-all-scores">';
+  Object.keys(TCM_TYPES).forEach(function(k) {
+    var t = TCM_TYPES[k];
+    var s = assess.scores[k] || 0;
+    var isPrimary = (k === assess.result.primary);
+    var pct = Math.min((s / 50) * 100, 100);
+    var barColor = isPrimary ? t.color : '#D1D5DB';
+    html += '<div class="fr-tcm-score-row' + (isPrimary ? ' primary' : '') + '">' +
+      '<span class="fr-tcm-score-row-label">' + t.icon + ' ' + t.name + '</span>' +
+      '<div class="fr-tcm-score-row-bar"><div class="fr-tcm-score-row-fill" style="width:' + pct + '%;background:' + barColor + ';"></div></div>' +
+      '<span class="fr-tcm-score-row-val"' + (isPrimary ? ' style="color:' + t.color + ';font-weight:700;"' : '') + '>' + s + '</span>' +
+    '</div>';
+  });
+  html += '</div>';
+
+  // 体质特征
+  html += '<div class="fr-detail-card"><div class="fr-detail-card-title">📋 体质特征</div><p style="font-size:var(--font-size-sm);color:var(--color-gray-600);line-height:1.7;margin:0;">' + primary.desc + '</p></div>';
+
+  // 调养建议
+  html += '<div class="fr-detail-card"><div class="fr-detail-card-title">💡 调养建议</div><ul style="font-size:var(--font-size-sm);color:var(--color-gray-600);line-height:1.8;margin:0;padding-left:18px;">';
+  primary.tips.forEach(function(tip) { html += '<li>' + tip + '</li>'; });
+  html += '</ul></div>';
+
+  panel.innerHTML = html;
+}
 
 // === end app.js ===
 </script>

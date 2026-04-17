@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -4699,6 +4699,21 @@ textarea.edit-input {
   gap: var(--space-3);
   flex: 1;
 }
+.gd-full-record-btn {
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  background: var(--color-primary-500);
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.gd-full-record-btn:hover {
+  background: var(--color-primary-600);
+}
 .guidance-detail-avatar {
   width: 40px;
   height: 40px;
@@ -5056,6 +5071,9 @@ textarea.edit-input {
       <div class="fr-panel" id="fr-panel-trend"></div>
       <div class="fr-panel" id="fr-panel-prescription"></div>
       <div class="fr-panel" id="fr-panel-tcm"></div>
+      <div class="fr-panel" id="fr-panel-sport-device"></div>
+      <div class="fr-panel" id="fr-panel-diet-record"></div>
+      <div class="fr-panel" id="fr-panel-sport-record"></div>
     </div>
   </div>
 </div>
@@ -6545,9 +6563,34 @@ function switchFrTab(tabId) {
 
 // ========== 完整档案：总渲染入口 ==========
 function renderFullRecord(key) {
-  var p = patients[key];
+  var p = patients[key] || guidanceExtraPatients[key];
+  if (!p) return;
   var fr = fullRecordData[key];
-  if (!p || !fr) return;
+  // 对guidanceExtraPatients中无详细档案的人，生成一份默认档案
+  if (!fr) {
+    fr = {
+      personalHistory: {
+        occupation: p.occupation || "—",
+        education: p.education || "—",
+        maritalStatus: p.maritalStatus || "—",
+        dietHabit: "—",
+        exerciseFreq: "—",
+        sleepTime: "—",
+        stressLevel: "—",
+        allergy: "无已知过敏史",
+        familyHistory: []
+      },
+      medicalHistory: [],
+      medications: [],
+      weightGoal: {
+        motivation: "—",
+        targetWeight: p.prescription && p.prescription.targetWeight || "—",
+        targetBMI: "—",
+        selfDiscipline: "—",
+        freeTime: "—"
+      }
+    };
+  }
 
   // 顶部标题
   var titleEl = document.getElementById("fr-title");
@@ -6569,6 +6612,9 @@ function renderFullRecord(key) {
   renderFrTrendFull(p);
   renderFrPrescription(p);
   renderFrTcm(p);
+  renderFrSportDevice(p);
+  renderFrDietRecord(p);
+  renderFrSportRecord(p);
 
   // 默认显示基本信息Tab
   switchFrTab("basic");
@@ -6639,7 +6685,10 @@ function renderFrTabs() {
     { tab: "med-exam", icon: "🔬", label: "医学检查" },
     { tab: "trend", icon: "📈", label: "趋势变化" },
     { tab: "prescription", icon: "📝", label: "处方指导" },
-    { tab: "tcm", icon: "🧘", label: "中医体质" }
+    { tab: "tcm", icon: "🧘", label: "中医体质" },
+    { tab: "sport-device", icon: "⌚", label: "运动设备" },
+    { tab: "diet-record", icon: "🥗", label: "饮食记录" },
+    { tab: "sport-record", icon: "🏃", label: "运动记录" }
   ];
   var html = "";
   for (var i = 0; i < tabDefs.length; i++) {
@@ -7472,6 +7521,8 @@ function renderGuidanceDetail(key) {
   html += '<div><div class="guidance-detail-name">' + p.name + ' 的健康指导</div>';
   html += '<div class="guidance-detail-sub">' + (p.fileNo || "") + ' | ' + p.gender + ' / ' + p.age + '岁 | ' + p.type + '</div>';
   html += '</div></div>';
+  // 右侧操作按钮：完整档案
+  html += '<button class="gd-full-record-btn" onclick="openFullRecord(\'' + key + '\')">📋 完整档案</button>';
   html += '</div>';
 
   // Tab切换栏
@@ -8660,9 +8711,541 @@ function renderFrTcm(p) {
 
   panel.innerHTML = html;
 }
-
-// === end app.js ===
 </script>
 
+<!-- 3个新Tab的渲染函数（位于独立script块中） -->
+<script>
+// ========== 完整档案 Tab: 运动设备 ==========
+function renderFrSportDevice(p) {
+  var panel = document.getElementById("fr-panel-sport-device");
+  if (!panel) return;
+
+  // Mock数据：本月(2026-04)各设备上报数据
+  var month = "2026年04月";
+  var devices = [
+    {
+      name: "华为手表 GT4 Pro",
+      icon: "⌚",
+      type: "运动手表",
+      color: "#0022D9",
+      connected: "2026-02-15",
+      stats: [
+        { label: "本月步数", value: "182,340", unit: "步" },
+        { label: "本月运动时长", value: "1,240", unit: "分钟" },
+        { label: "平均心率", value: "74", unit: "bpm" },
+        { label: "最高心率", value: "148", unit: "bpm" },
+        { label: "平均血氧", value: "97.2", unit: "%" },
+        { label: "睡眠时长(均)", value: "6.8", unit: "小时" }
+      ],
+      daily: [
+        { date: "04-01", steps: 8240, hrAvg: 72, sleep: 6.5 },
+        { date: "04-03", steps: 11380, hrAvg: 78, sleep: 7.2 },
+        { date: "04-05", steps: 6820, hrAvg: 71, sleep: 6.0 },
+        { date: "04-07", steps: 9560, hrAvg: 75, sleep: 7.5 },
+        { date: "04-10", steps: 12300, hrAvg: 82, sleep: 6.8 },
+        { date: "04-14", steps: 7430, hrAvg: 70, sleep: 7.0 },
+        { date: "04-17", steps: 10280, hrAvg: 76, sleep: 6.5 }
+      ]
+    },
+    {
+      name: "乐心体脂秤 S9",
+      icon: "⚖️",
+      type: "体脂秤",
+      color: "#10B981",
+      connected: "2026-02-20",
+      stats: [
+        { label: "本月称重次数", value: "18", unit: "次" },
+        { label: "最新体重", value: "84.7", unit: "kg" },
+        { label: "体脂率变化", value: "-0.4", unit: "%" },
+        { label: "骨骼肌变化", value: "+0.3", unit: "kg" },
+        { label: "内脏脂肪", value: "126", unit: "cm²" },
+        { label: "基础代谢", value: "1,842", unit: "kcal" }
+      ],
+      daily: [
+        { date: "04-01", weight: 85.4, fat: 27.2, muscle: 31.8 },
+        { date: "04-04", weight: 85.1, fat: 27.0, muscle: 31.9 },
+        { date: "04-07", weight: 84.9, fat: 26.9, muscle: 32.0 },
+        { date: "04-10", weight: 84.6, fat: 26.7, muscle: 32.1 },
+        { date: "04-14", weight: 84.8, fat: 26.8, muscle: 32.0 },
+        { date: "04-17", weight: 84.7, fat: 26.8, muscle: 32.1 }
+      ]
+    },
+    {
+      name: "诺德士 T6.5S 跑步机",
+      icon: "🏃",
+      type: "跑步机",
+      color: "#F59E0B",
+      connected: "2026-03-01",
+      stats: [
+        { label: "本月使用次数", value: "12", unit: "次" },
+        { label: "本月跑步里程", value: "68.4", unit: "km" },
+        { label: "本月消耗热量", value: "3,842", unit: "kcal" },
+        { label: "平均配速", value: "7'24\"", unit: "/km" },
+        { label: "最长单次", value: "8.2", unit: "km" },
+        { label: "累计时长", value: "342", unit: "分钟" }
+      ],
+      daily: [
+        { date: "04-02", dist: 5.2, kcal: 312, duration: 38 },
+        { date: "04-05", dist: 6.8, kcal: 408, duration: 50 },
+        { date: "04-08", dist: 5.0, kcal: 300, duration: 36 },
+        { date: "04-11", dist: 7.5, kcal: 450, duration: 56 },
+        { date: "04-14", dist: 6.0, kcal: 360, duration: 44 },
+        { date: "04-16", dist: 8.2, kcal: 492, duration: 60 }
+      ]
+    }
+  ];
+
+  var html = '<div class="fr-detail-grid">';
+
+  // 顶部月份选择 + 概览
+  html += '<div class="fr-detail-card" style="grid-column:1/-1;">' +
+    '<div class="fr-detail-card-title" style="display:flex;align-items:center;justify-content:space-between;">' +
+      '<span>⌚ 运动设备数据汇总</span>' +
+      '<span style="font-size:var(--font-size-sm);font-weight:400;color:var(--color-gray-500);background:var(--color-gray-100);padding:4px 12px;border-radius:var(--radius-full);">' + month + '</span>' +
+    '</div>' +
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-4);margin-top:var(--space-4);">' +
+      '<div style="text-align:center;padding:var(--space-4);background:#E8EAFF;border-radius:var(--radius-md);">' +
+        '<div style="font-size:28px;font-weight:700;color:#0022D9;">3</div>' +
+        '<div style="font-size:var(--font-size-xs);color:var(--color-gray-500);margin-top:4px;">已连接设备</div>' +
+      '</div>' +
+      '<div style="text-align:center;padding:var(--space-4);background:#D1FAE5;border-radius:var(--radius-md);">' +
+        '<div style="font-size:28px;font-weight:700;color:#10B981;">37</div>' +
+        '<div style="font-size:var(--font-size-xs);color:var(--color-gray-500);margin-top:4px;">本月数据上传次数</div>' +
+      '</div>' +
+      '<div style="text-align:center;padding:var(--space-4);background:#FEF3C7;border-radius:var(--radius-md);">' +
+        '<div style="font-size:28px;font-weight:700;color:#D97706;">5,084</div>' +
+        '<div style="font-size:var(--font-size-xs);color:var(--color-gray-500);margin-top:4px;">本月运动消耗(kcal)</div>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+
+  // 各设备详情卡片
+  devices.forEach(function(dev) {
+    html += '<div class="fr-detail-card">' +
+      '<div class="fr-detail-card-title" style="display:flex;align-items:center;gap:8px;">' +
+        '<span style="font-size:20px;">' + dev.icon + '</span>' +
+        '<div>' +
+          '<div style="font-weight:600;color:var(--color-gray-800);">' + dev.name + '</div>' +
+          '<div style="font-size:var(--font-size-xs);color:var(--color-gray-400);margin-top:2px;">' + dev.type + ' · 接入时间：' + dev.connected + '</div>' +
+        '</div>' +
+        '<span style="margin-left:auto;background:' + dev.color + '15;color:' + dev.color + ';font-size:var(--font-size-xs);padding:2px 10px;border-radius:var(--radius-full);font-weight:600;">已连接</span>' +
+      '</div>' +
+      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-3);margin-top:var(--space-4);">';
+
+    dev.stats.forEach(function(s) {
+      html += '<div style="background:var(--color-gray-50);border-radius:var(--radius-md);padding:var(--space-3);">' +
+        '<div style="font-size:var(--font-size-xs);color:var(--color-gray-400);margin-bottom:4px;">' + s.label + '</div>' +
+        '<div style="font-size:var(--font-size-lg);font-weight:700;color:var(--color-gray-800);">' + s.value + '<span style="font-size:var(--font-size-xs);font-weight:400;color:var(--color-gray-400);margin-left:2px;">' + s.unit + '</span></div>' +
+      '</div>';
+    });
+
+    html += '</div>';
+
+    // 每日明细表
+    html += '<div style="margin-top:var(--space-4);">' +
+      '<div style="font-size:var(--font-size-xs);font-weight:600;color:var(--color-gray-500);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:var(--space-2);">本月部分记录</div>' +
+      '<table style="width:100%;border-collapse:collapse;font-size:var(--font-size-xs);">' +
+      '<thead><tr style="background:var(--color-gray-50);">';
+
+    if (dev.type === "运动手表") {
+      html += '<th style="padding:6px 10px;text-align:left;color:var(--color-gray-500);font-weight:500;">日期</th>' +
+        '<th style="padding:6px 10px;text-align:right;color:var(--color-gray-500);font-weight:500;">步数</th>' +
+        '<th style="padding:6px 10px;text-align:right;color:var(--color-gray-500);font-weight:500;">平均心率</th>' +
+        '<th style="padding:6px 10px;text-align:right;color:var(--color-gray-500);font-weight:500;">睡眠(h)</th>';
+      html += '</tr></thead><tbody>';
+      dev.daily.forEach(function(d, i) {
+        html += '<tr style="border-top:1px solid var(--color-gray-100);">' +
+          '<td style="padding:6px 10px;color:var(--color-gray-700);">' + d.date + '</td>' +
+          '<td style="padding:6px 10px;text-align:right;color:var(--color-gray-700);">' + d.steps.toLocaleString() + '</td>' +
+          '<td style="padding:6px 10px;text-align:right;color:' + (d.hrAvg > 80 ? 'var(--color-warning)' : 'var(--color-success)') + ';font-weight:600;">' + d.hrAvg + ' bpm</td>' +
+          '<td style="padding:6px 10px;text-align:right;color:' + (d.sleep < 7 ? 'var(--color-warning)' : 'var(--color-success)') + ';font-weight:600;">' + d.sleep + '</td>' +
+        '</tr>';
+      });
+    } else if (dev.type === "体脂秤") {
+      html += '<th style="padding:6px 10px;text-align:left;color:var(--color-gray-500);font-weight:500;">日期</th>' +
+        '<th style="padding:6px 10px;text-align:right;color:var(--color-gray-500);font-weight:500;">体重(kg)</th>' +
+        '<th style="padding:6px 10px;text-align:right;color:var(--color-gray-500);font-weight:500;">体脂率%</th>' +
+        '<th style="padding:6px 10px;text-align:right;color:var(--color-gray-500);font-weight:500;">骨骼肌(kg)</th>';
+      html += '</tr></thead><tbody>';
+      dev.daily.forEach(function(d) {
+        html += '<tr style="border-top:1px solid var(--color-gray-100);">' +
+          '<td style="padding:6px 10px;color:var(--color-gray-700);">' + d.date + '</td>' +
+          '<td style="padding:6px 10px;text-align:right;font-weight:600;color:var(--color-gray-800);">' + d.weight + '</td>' +
+          '<td style="padding:6px 10px;text-align:right;color:' + (d.fat > 25 ? 'var(--color-warning)' : 'var(--color-success)') + ';font-weight:600;">' + d.fat + '%</td>' +
+          '<td style="padding:6px 10px;text-align:right;color:var(--color-info);">' + d.muscle + '</td>' +
+        '</tr>';
+      });
+    } else if (dev.type === "跑步机") {
+      html += '<th style="padding:6px 10px;text-align:left;color:var(--color-gray-500);font-weight:500;">日期</th>' +
+        '<th style="padding:6px 10px;text-align:right;color:var(--color-gray-500);font-weight:500;">里程(km)</th>' +
+        '<th style="padding:6px 10px;text-align:right;color:var(--color-gray-500);font-weight:500;">时长(min)</th>' +
+        '<th style="padding:6px 10px;text-align:right;color:var(--color-gray-500);font-weight:500;">消耗(kcal)</th>';
+      html += '</tr></thead><tbody>';
+      dev.daily.forEach(function(d) {
+        html += '<tr style="border-top:1px solid var(--color-gray-100);">' +
+          '<td style="padding:6px 10px;color:var(--color-gray-700);">' + d.date + '</td>' +
+          '<td style="padding:6px 10px;text-align:right;font-weight:600;color:var(--color-gray-800);">' + d.dist + '</td>' +
+          '<td style="padding:6px 10px;text-align:right;color:var(--color-info);">' + d.duration + ' min</td>' +
+          '<td style="padding:6px 10px;text-align:right;color:var(--color-warning);font-weight:600;">' + d.kcal + '</td>' +
+        '</tr>';
+      });
+    }
+
+    html += '</tbody></table></div>';
+    html += '</div>';
+  });
+
+  html += '</div>';
+  panel.innerHTML = html;
+}
+
+// ========== 完整档案 Tab: 饮食记录 ==========
+function renderFrDietRecord(p) {
+  var panel = document.getElementById("fr-panel-diet-record");
+  if (!panel) return;
+
+  var month = "2026年04月";
+  // Mock数据：饮食记录（部分日期）
+  var dietData = [
+    {
+      date: "2026-04-17", day: "周四",
+      totalKcal: 1820, targetKcal: 1600, compliance: "偏高",
+      meals: [
+        { name: "早餐", time: "07:30", kcal: 380, items: [
+          { food: "全麦吐司", weight: 80, kcal: 200 },
+          { food: "水煮蛋", weight: 60, kcal: 85 },
+          { food: "低脂牛奶", weight: 200, kcal: 72 },
+          { food: "小番茄", weight: 50, kcal: 23 }
+        ]},
+        { name: "午餐", time: "12:15", kcal: 620, items: [
+          { food: "杂粮米饭", weight: 200, kcal: 232 },
+          { food: "清蒸鲈鱼", weight: 150, kcal: 165 },
+          { food: "炒西兰花", weight: 100, kcal: 35 },
+          { food: "紫菜蛋花汤", weight: 300, kcal: 48 },
+          { food: "苹果", weight: 150, kcal: 78 }
+        ]},
+        { name: "晚餐", time: "19:30", kcal: 580, items: [
+          { food: "燕麦粥", weight: 150, kcal: 92 },
+          { food: "盐水鸡胸肉", weight: 120, kcal: 148 },
+          { food: "凉拌黄瓜", weight: 100, kcal: 18 },
+          { food: "烤南瓜", weight: 120, kcal: 68 },
+          { food: "无糖豆浆", weight: 250, kcal: 40 }
+        ]},
+        { name: "加餐", time: "15:00", kcal: 240, items: [
+          { food: "坚果混合(腰果/核桃)", weight: 30, kcal: 180 },
+          { food: "蓝莓", weight: 80, kcal: 46 }
+        ]}
+      ]
+    },
+    {
+      date: "2026-04-16", day: "周三",
+      totalKcal: 1580, targetKcal: 1600, compliance: "达标",
+      meals: [
+        { name: "早餐", time: "07:45", kcal: 340, items: [
+          { food: "燕麦片（无糖）", weight: 60, kcal: 216 },
+          { food: "香蕉", weight: 100, kcal: 93 },
+          { food: "低脂牛奶", weight: 150, kcal: 54 }
+        ]},
+        { name: "午餐", time: "12:00", kcal: 580, items: [
+          { food: "藜麦饭", weight: 180, kcal: 198 },
+          { food: "番茄炖牛腩(少油)", weight: 180, kcal: 234 },
+          { food: "炒菠菜", weight: 120, kcal: 38 },
+          { food: "紫菜汤", weight: 200, kcal: 22 }
+        ]},
+        { name: "晚餐", time: "18:30", kcal: 480, items: [
+          { food: "蒸红薯", weight: 200, kcal: 172 },
+          { food: "水煮虾", weight: 100, kcal: 93 },
+          { food: "凉拌木耳", weight: 80, kcal: 19 },
+          { food: "冬瓜汤", weight: 300, kcal: 36 }
+        ]},
+        { name: "加餐", time: "16:00", kcal: 180, items: [
+          { food: "无糖酸奶", weight: 150, kcal: 117 },
+          { food: "草莓", weight: 80, kcal: 27 }
+        ]}
+      ]
+    },
+    {
+      date: "2026-04-14", day: "周一",
+      totalKcal: 2180, targetKcal: 1600, compliance: "超标",
+      meals: [
+        { name: "早餐", time: "08:00", kcal: 420, items: [
+          { food: "肠粉（加叉烧）", weight: 200, kcal: 320 },
+          { food: "豆浆", weight: 250, kcal: 100 }
+        ]},
+        { name: "午餐", time: "12:30", kcal: 820, items: [
+          { food: "白米饭", weight: 250, kcal: 290 },
+          { food: "红烧肉(小碗)", weight: 150, kcal: 390 },
+          { food: "炒白菜", weight: 100, kcal: 40 },
+          { food: "紫菜汤", weight: 200, kcal: 22 }
+        ]},
+        { name: "晚餐", time: "20:00", kcal: 680, items: [
+          { food: "应酬聚餐", weight: 0, kcal: 680, note: "估算" }
+        ]},
+        { name: "加餐", time: "22:00", kcal: 260, items: [
+          { food: "夜宵：盐焗鸡翅", weight: 100, kcal: 210 },
+          { food: "啤酒350ml", weight: 350, kcal: 150 }
+        ]}
+      ]
+    }
+  ];
+
+  // 月度汇总数据
+  var summary = {
+    totalDays: 17,
+    recordDays: 14,
+    avgKcal: 1742,
+    targetKcal: 1600,
+    breakfastRate: 100,
+    lunchRate: 93,
+    dinnerRate: 100,
+    snackRate: 78,
+    overTargetDays: 5,
+    reachTargetDays: 9
+  };
+
+  var html = '<div class="fr-detail-grid">';
+
+  // 月度概览
+  html += '<div class="fr-detail-card" style="grid-column:1/-1;">' +
+    '<div class="fr-detail-card-title" style="display:flex;align-items:center;justify-content:space-between;">' +
+      '<span>🥗 饮食记录概览</span>' +
+      '<span style="font-size:var(--font-size-sm);font-weight:400;color:var(--color-gray-500);background:var(--color-gray-100);padding:4px 12px;border-radius:var(--radius-full);">' + month + '</span>' +
+    '</div>' +
+    '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-3);margin-top:var(--space-4);">' +
+      '<div style="text-align:center;padding:var(--space-4);background:#E8EAFF;border-radius:var(--radius-md);">' +
+        '<div style="font-size:24px;font-weight:700;color:#0022D9;">' + summary.recordDays + '/' + summary.totalDays + '</div>' +
+        '<div style="font-size:var(--font-size-xs);color:var(--color-gray-500);margin-top:4px;">已记录天数</div>' +
+      '</div>' +
+      '<div style="text-align:center;padding:var(--space-4);background:' + (summary.avgKcal > summary.targetKcal ? '#FEE2E2' : '#D1FAE5') + ';border-radius:var(--radius-md);">' +
+        '<div style="font-size:24px;font-weight:700;color:' + (summary.avgKcal > summary.targetKcal ? 'var(--color-error)' : 'var(--color-success)') + ';">' + summary.avgKcal + '</div>' +
+        '<div style="font-size:var(--font-size-xs);color:var(--color-gray-500);margin-top:4px;">日均摄入(kcal)</div>' +
+        '<div style="font-size:var(--font-size-xs);color:var(--color-gray-400);">目标：' + summary.targetKcal + ' kcal</div>' +
+      '</div>' +
+      '<div style="text-align:center;padding:var(--space-4);background:#D1FAE5;border-radius:var(--radius-md);">' +
+        '<div style="font-size:24px;font-weight:700;color:var(--color-success);">' + summary.reachTargetDays + '天</div>' +
+        '<div style="font-size:var(--font-size-xs);color:var(--color-gray-500);margin-top:4px;">热量达标天数</div>' +
+      '</div>' +
+      '<div style="text-align:center;padding:var(--space-4);background:#FEE2E2;border-radius:var(--radius-md);">' +
+        '<div style="font-size:24px;font-weight:700;color:var(--color-error);">' + summary.overTargetDays + '天</div>' +
+        '<div style="font-size:var(--font-size-xs);color:var(--color-gray-500);margin-top:4px;">热量超标天数</div>' +
+      '</div>' +
+    '</div>' +
+    // 餐次记录率
+    '<div style="margin-top:var(--space-4);">' +
+      '<div style="font-size:var(--font-size-xs);font-weight:600;color:var(--color-gray-500);margin-bottom:var(--space-3);">餐次记录率</div>' +
+      '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-3);">' +
+        [['早餐', summary.breakfastRate], ['午餐', summary.lunchRate], ['晚餐', summary.dinnerRate], ['加餐', summary.snackRate]].map(function(m) {
+          var pct = m[1];
+          var color = pct >= 90 ? 'var(--color-success)' : pct >= 70 ? 'var(--color-warning)' : 'var(--color-error)';
+          return '<div style="background:var(--color-gray-50);border-radius:var(--radius-md);padding:var(--space-3);">' +
+            '<div style="font-size:var(--font-size-xs);color:var(--color-gray-500);">' + m[0] + '</div>' +
+            '<div style="margin-top:6px;background:var(--color-gray-200);border-radius:var(--radius-full);height:6px;">' +
+              '<div style="width:' + pct + '%;background:' + color + ';height:6px;border-radius:var(--radius-full);"></div>' +
+            '</div>' +
+            '<div style="font-size:var(--font-size-xs);font-weight:600;color:' + color + ';margin-top:4px;">' + pct + '%</div>' +
+          '</div>';
+        }).join('') +
+      '</div>' +
+    '</div>' +
+  '</div>';
+
+  // 每日饮食明细
+  dietData.forEach(function(day) {
+    var compColor = day.compliance === "达标" ? 'var(--color-success)' : day.compliance === "超标" ? 'var(--color-error)' : 'var(--color-warning)';
+    var compBg = day.compliance === "达标" ? '#D1FAE5' : day.compliance === "超标" ? '#FEE2E2' : '#FEF3C7';
+
+    html += '<div class="fr-detail-card" style="grid-column:1/-1;">' +
+      '<div class="fr-detail-card-title" style="display:flex;align-items:center;gap:var(--space-3);">' +
+        '<span>📅 ' + day.date + ' ' + day.day + '</span>' +
+        '<span style="margin-left:auto;background:' + compBg + ';color:' + compColor + ';font-size:var(--font-size-xs);padding:2px 12px;border-radius:var(--radius-full);font-weight:600;">热量' + day.compliance + '</span>' +
+        '<span style="font-size:var(--font-size-sm);font-weight:700;color:' + compColor + ';">' + day.totalKcal + ' kcal</span>' +
+        '<span style="font-size:var(--font-size-xs);color:var(--color-gray-400);">/ 目标 ' + day.targetKcal + ' kcal</span>' +
+      '</div>';
+
+    // 餐次卡片
+    html += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-3);margin-top:var(--space-3);">';
+    day.meals.forEach(function(meal) {
+      html += '<div style="background:var(--color-gray-50);border-radius:var(--radius-md);padding:var(--space-3);">' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-2);">' +
+          '<span style="font-size:var(--font-size-sm);font-weight:600;color:var(--color-gray-700);">' + meal.name + '</span>' +
+          '<span style="font-size:var(--font-size-xs);color:var(--color-gray-400);">' + meal.time + '</span>' +
+          '<span style="font-size:var(--font-size-sm);font-weight:700;color:#0022D9;">' + meal.kcal + ' kcal</span>' +
+        '</div>';
+      html += '<table style="width:100%;border-collapse:collapse;">';
+      meal.items.forEach(function(item) {
+        html += '<tr>' +
+          '<td style="padding:3px 0;font-size:var(--font-size-xs);color:var(--color-gray-600);">' + item.food + (item.note ? '<span style="color:var(--color-gray-400);">('+item.note+')</span>' : '') + '</td>' +
+          (item.weight ? '<td style="padding:3px 0;font-size:var(--font-size-xs);color:var(--color-gray-400);text-align:right;">' + item.weight + 'g</td>' : '<td></td>') +
+          '<td style="padding:3px 0;font-size:var(--font-size-xs);color:var(--color-warning);text-align:right;">' + item.kcal + 'kcal</td>' +
+        '</tr>';
+      });
+      html += '</table></div>';
+    });
+    html += '</div>';
+    html += '</div>';
+  });
+
+  html += '</div>';
+  panel.innerHTML = html;
+}
+
+// ========== 完整档案 Tab: 运动记录 ==========
+function renderFrSportRecord(p) {
+  var panel = document.getElementById("fr-panel-sport-record");
+  if (!panel) return;
+
+  var month = "2026年04月";
+  // Mock数据：运动记录
+  var sportRecords = [
+    { date: "2026-04-17", day: "周四", time: "06:30", type: "跑步", icon: "🏃", duration: 42, kcal: 368, distance: 5.8, unit: "km", intensity: "中等", hr: 142, note: "晨跑，天气好，全程稳速" },
+    { date: "2026-04-16", day: "周三", time: "19:00", type: "跳绳", icon: "🪢", duration: 25, kcal: 280, distance: null, unit: null, intensity: "较高", hr: 156, note: "连跳1500下，休息3组" },
+    { date: "2026-04-15", day: "周二", time: "07:00", type: "跑步", icon: "🏃", duration: 38, kcal: 322, distance: 5.2, unit: "km", intensity: "中等", hr: 138, note: "晨跑" },
+    { date: "2026-04-14", day: "周一", time: "休息", type: "休息日", icon: "😴", duration: 0, kcal: 0, distance: null, unit: null, intensity: "—", hr: null, note: "工作应酬，未运动" },
+    { date: "2026-04-13", day: "周日", time: "09:00", type: "游泳", icon: "🏊", duration: 60, kcal: 480, distance: 1.2, unit: "km", intensity: "中高", hr: 148, note: "自由泳+蛙泳，各600m" },
+    { date: "2026-04-12", day: "周六", time: "06:45", type: "跑步", icon: "🏃", duration: 50, kcal: 430, distance: 7.0, unit: "km", intensity: "中等", hr: 140, note: "周末长跑" },
+    { date: "2026-04-11", day: "周五", time: "19:30", type: "力量训练", icon: "🏋️", duration: 45, kcal: 310, distance: null, unit: null, intensity: "较高", hr: 152, note: "哑铃+弹力带，上肢训练" },
+    { date: "2026-04-10", day: "周四", time: "07:00", type: "跑步", icon: "🏃", duration: 35, kcal: 298, distance: 4.8, unit: "km", intensity: "中等", hr: 135, note: "晨跑" },
+    { date: "2026-04-09", day: "周三", time: "19:00", type: "跳绳", icon: "🪢", duration: 20, kcal: 224, distance: null, unit: null, intensity: "较高", hr: 160, note: "2000下，分4组" },
+    { date: "2026-04-08", day: "周二", time: "休息", type: "休息日", icon: "😴", duration: 0, kcal: 0, distance: null, unit: null, intensity: "—", hr: null, note: "下雨，室外活动受限" },
+    { date: "2026-04-07", day: "周一", time: "06:30", type: "跑步", icon: "🏃", duration: 40, kcal: 340, distance: 5.5, unit: "km", intensity: "中等", hr: 139, note: "晨跑" },
+    { date: "2026-04-06", day: "周日", time: "10:00", type: "游泳", icon: "🏊", duration: 55, kcal: 440, distance: 1.0, unit: "km", intensity: "中等", hr: 140, note: "技术练习" }
+  ];
+
+  // 月度汇总
+  var activeDays = sportRecords.filter(function(r) { return r.duration > 0; }).length;
+  var totalKcal = sportRecords.reduce(function(s, r) { return s + r.kcal; }, 0);
+  var totalDuration = sportRecords.reduce(function(s, r) { return s + r.duration; }, 0);
+  var totalDistance = sportRecords.reduce(function(s, r) { return s + (r.distance || 0); }, 0);
+
+  // 运动类型统计
+  var typeCount = {};
+  sportRecords.forEach(function(r) {
+    if (r.duration > 0) {
+      if (!typeCount[r.type]) typeCount[r.type] = { count: 0, kcal: 0, duration: 0, icon: r.icon };
+      typeCount[r.type].count++;
+      typeCount[r.type].kcal += r.kcal;
+      typeCount[r.type].duration += r.duration;
+    }
+  });
+
+  var html = '<div class="fr-detail-grid">';
+
+  // 月度概览卡片
+  html += '<div class="fr-detail-card" style="grid-column:1/-1;">' +
+    '<div class="fr-detail-card-title" style="display:flex;align-items:center;justify-content:space-between;">' +
+      '<span>🏃 运动记录概览</span>' +
+      '<span style="font-size:var(--font-size-sm);font-weight:400;color:var(--color-gray-500);background:var(--color-gray-100);padding:4px 12px;border-radius:var(--radius-full);">' + month + '</span>' +
+    '</div>' +
+    '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-3);margin-top:var(--space-4);">' +
+      '<div style="text-align:center;padding:var(--space-4);background:#E8EAFF;border-radius:var(--radius-md);">' +
+        '<div style="font-size:24px;font-weight:700;color:#0022D9;">' + activeDays + '</div>' +
+        '<div style="font-size:var(--font-size-xs);color:var(--color-gray-500);margin-top:4px;">运动天数</div>' +
+      '</div>' +
+      '<div style="text-align:center;padding:var(--space-4);background:#FEF3C7;border-radius:var(--radius-md);">' +
+        '<div style="font-size:24px;font-weight:700;color:var(--color-warning);">' + totalKcal.toLocaleString() + '</div>' +
+        '<div style="font-size:var(--font-size-xs);color:var(--color-gray-500);margin-top:4px;">总消耗(kcal)</div>' +
+      '</div>' +
+      '<div style="text-align:center;padding:var(--color-gray-50) ?  var(--space-4) : var(--space-4);padding:var(--space-4);background:#D1FAE5;border-radius:var(--radius-md);">' +
+        '<div style="font-size:24px;font-weight:700;color:var(--color-success);">' + Math.floor(totalDuration / 60) + 'h' + (totalDuration % 60) + 'm</div>' +
+        '<div style="font-size:var(--font-size-xs);color:var(--color-gray-500);margin-top:4px;">总运动时长</div>' +
+      '</div>' +
+      '<div style="text-align:center;padding:var(--space-4);background:#DBEAFE;border-radius:var(--radius-md);">' +
+        '<div style="font-size:24px;font-weight:700;color:var(--color-info);">' + totalDistance.toFixed(1) + '</div>' +
+        '<div style="font-size:var(--font-size-xs);color:var(--color-gray-500);margin-top:4px;">跑步/游泳(km)</div>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+
+  // 运动类型分布
+  html += '<div class="fr-detail-card">' +
+    '<div class="fr-detail-card-title">📊 运动类型分布</div>' +
+    '<div style="margin-top:var(--space-3);">';
+  Object.keys(typeCount).forEach(function(type) {
+    var t = typeCount[type];
+    var pct = Math.round((t.count / activeDays) * 100);
+    var colors = { "跑步": "#0022D9", "游泳": "#3B82F6", "跳绳": "#10B981", "力量训练": "#F59E0B" };
+    var c = colors[type] || "#6B7280";
+    html += '<div style="margin-bottom:var(--space-3);">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">' +
+        '<span style="font-size:var(--font-size-sm);">' + t.icon + ' ' + type + '</span>' +
+        '<span style="font-size:var(--font-size-xs);color:var(--color-gray-500);">' + t.count + '次 · ' + t.kcal + ' kcal</span>' +
+      '</div>' +
+      '<div style="background:var(--color-gray-200);border-radius:var(--radius-full);height:8px;">' +
+        '<div style="width:' + pct + '%;background:' + c + ';height:8px;border-radius:var(--radius-full);"></div>' +
+      '</div>' +
+    '</div>';
+  });
+  html += '</div></div>';
+
+  // 每周运动天数热图（简易）
+  html += '<div class="fr-detail-card">' +
+    '<div class="fr-detail-card-title">📅 本月运动热图</div>' +
+    '<div style="margin-top:var(--space-3);display:flex;flex-wrap:wrap;gap:6px;">';
+  var dateMap = {};
+  sportRecords.forEach(function(r) { dateMap[r.date] = r; });
+  for (var d = 1; d <= 17; d++) {
+    var dateStr = "2026-04-" + (d < 10 ? "0" + d : d);
+    var rec = dateMap[dateStr];
+    var bg = !rec ? '#F3F4F6' : rec.duration === 0 ? '#FEE2E2' : rec.kcal >= 400 ? '#0022D9' : rec.kcal >= 280 ? '#5869FF' : '#A8B1FF';
+    var title = rec ? (rec.type + " " + rec.kcal + "kcal") : "无记录";
+    html += '<div title="' + title + '" style="width:32px;height:32px;border-radius:6px;background:' + bg + ';display:flex;align-items:center;justify-content:center;font-size:11px;color:' + (bg === '#0022D9' || bg === '#5869FF' ? '#fff' : 'var(--color-gray-500)') + ';">' + d + '</div>';
+  }
+  html += '</div>' +
+    '<div style="display:flex;gap:12px;margin-top:var(--space-3);font-size:var(--font-size-xs);color:var(--color-gray-500);">' +
+      '<span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#F3F4F6;margin-right:4px;"></span>无记录</span>' +
+      '<span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#FEE2E2;margin-right:4px;"></span>休息日</span>' +
+      '<span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#A8B1FF;margin-right:4px;"></span>轻度</span>' +
+      '<span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#0022D9;margin-right:4px;"></span>高强度</span>' +
+    '</div>' +
+  '</div>';
+
+  // 运动明细列表
+  html += '<div class="fr-detail-card" style="grid-column:1/-1;">' +
+    '<div class="fr-detail-card-title">📋 运动明细记录</div>' +
+    '<table style="width:100%;border-collapse:collapse;margin-top:var(--space-3);font-size:var(--font-size-sm);">' +
+    '<thead><tr style="background:var(--color-gray-50);">' +
+      '<th style="padding:8px 12px;text-align:left;color:var(--color-gray-500);font-weight:500;font-size:var(--font-size-xs);">日期</th>' +
+      '<th style="padding:8px 12px;text-align:left;color:var(--color-gray-500);font-weight:500;font-size:var(--font-size-xs);">时间</th>' +
+      '<th style="padding:8px 12px;text-align:left;color:var(--color-gray-500);font-weight:500;font-size:var(--font-size-xs);">运动类型</th>' +
+      '<th style="padding:8px 12px;text-align:right;color:var(--color-gray-500);font-weight:500;font-size:var(--font-size-xs);">时长</th>' +
+      '<th style="padding:8px 12px;text-align:right;color:var(--color-gray-500);font-weight:500;font-size:var(--font-size-xs);">里程</th>' +
+      '<th style="padding:8px 12px;text-align:right;color:var(--color-gray-500);font-weight:500;font-size:var(--font-size-xs);">消耗</th>' +
+      '<th style="padding:8px 12px;text-align:center;color:var(--color-gray-500);font-weight:500;font-size:var(--font-size-xs);">强度</th>' +
+      '<th style="padding:8px 12px;text-align:right;color:var(--color-gray-500);font-weight:500;font-size:var(--font-size-xs);">心率</th>' +
+    '</tr></thead><tbody>';
+
+  sportRecords.forEach(function(r) {
+    var isRest = r.duration === 0;
+    html += '<tr style="border-top:1px solid var(--color-gray-100);">' +
+      '<td style="padding:8px 12px;color:var(--color-gray-700);font-weight:500;">' + r.date.slice(5) + ' <span style="color:var(--color-gray-400);font-weight:400;">' + r.day + '</span></td>' +
+      '<td style="padding:8px 12px;color:var(--color-gray-500);">' + r.time + '</td>' +
+      '<td style="padding:8px 12px;">' +
+        '<span style="font-size:16px;">' + r.icon + '</span>' +
+        '<span style="margin-left:6px;color:' + (isRest ? 'var(--color-gray-400)' : 'var(--color-gray-800)') + ';font-weight:' + (isRest ? '400' : '500') + ';">' + r.type + '</span>' +
+      '</td>' +
+      '<td style="padding:8px 12px;text-align:right;color:' + (isRest ? 'var(--color-gray-300)' : 'var(--color-gray-700)') + ';">' + (isRest ? '—' : r.duration + ' min') + '</td>' +
+      '<td style="padding:8px 12px;text-align:right;color:' + (r.distance ? 'var(--color-info)' : 'var(--color-gray-300)') + ';">' + (r.distance ? r.distance + ' ' + r.unit : '—') + '</td>' +
+      '<td style="padding:8px 12px;text-align:right;font-weight:600;color:' + (isRest ? 'var(--color-gray-300)' : 'var(--color-warning)') + ';">' + (isRest ? '—' : r.kcal + ' kcal') + '</td>' +
+      '<td style="padding:8px 12px;text-align:center;">' +
+        (isRest ? '<span style="color:var(--color-gray-300);">—</span>' :
+          '<span style="font-size:var(--font-size-xs);padding:2px 8px;border-radius:var(--radius-full);background:' +
+          (r.intensity === '较高' || r.intensity === '中高' ? '#FEE2E2' : '#D1FAE5') +
+          ';color:' + (r.intensity === '较高' || r.intensity === '中高' ? 'var(--color-error)' : 'var(--color-success)') + ';">' + r.intensity + '</span>') +
+      '</td>' +
+      '<td style="padding:8px 12px;text-align:right;color:' + (r.hr ? (r.hr > 150 ? 'var(--color-error)' : 'var(--color-success)') : 'var(--color-gray-300)') + ';font-weight:600;">' + (r.hr ? r.hr + ' bpm' : '—') + '</td>' +
+    '</tr>';
+    if (r.note) {
+      html += '<tr style="border-top:none;">' +
+        '<td colspan="8" style="padding:0 12px 8px 12px;font-size:var(--font-size-xs);color:var(--color-gray-400);">📝 ' + r.note + '</td>' +
+      '</tr>';
+    }
+  });
+
+  html += '</tbody></table></div>';
+  html += '</div>';
+  panel.innerHTML = html;
+}
+
+</script>
 </body>
 </html>

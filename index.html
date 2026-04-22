@@ -4366,10 +4366,738 @@ textarea.edit-input {
   box-shadow: 0 4px 12px rgba(0, 34, 217, 0.25);
 }
 
-/* ===== 健康指导页面 ===== */
-.page-view.active {
+/* ===== 健康指导 / 患者档案页面（flex布局） ===== */
+#page-guidance.page-view.active,
+#page-patients.page-view.active {
   display: flex;
   flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+/* ============================================
+   患者档案列表页样式
+   ============================================ */
+
+/* 页面顶部操作栏 */
+.patients-page-header {
+  padding: var(--space-6) var(--space-8) var(--space-4);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--color-gray-100);
+  background: white;
+}
+.patients-page-title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-gray-900);
+  flex: 1;
+}
+.patients-page-actions {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+/* 搜索筛选栏 */
+.patients-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-8);
+  background: var(--color-gray-50);
+  border-bottom: 1px solid var(--color-gray-100);
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+.patients-search-box {
+  flex: 1;
+  min-width: 220px;
+  max-width: 360px;
+  position: relative;
+}
+.patients-search-box input {
+  width: 100%;
+  padding: 9px 14px 9px 38px;
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  background: white;
+  transition: border-color var(--transition-fast);
+}
+.patients-search-box input:focus {
+  border-color: var(--color-primary-400);
+  box-shadow: 0 0 0 3px rgba(0,34,217,0.08);
+}
+.patients-search-box .search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 15px;
+  color: var(--color-gray-400);
+}
+.filter-select {
+  padding: 8px 12px;
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-700);
+  background: white;
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+}
+.filter-select:focus {
+  border-color: var(--color-primary-400);
+  outline: none;
+}
+.filter-divider {
+  width: 1px;
+  height: 24px;
+  background: var(--color-gray-200);
+}
+.patients-count-badge {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-500);
+  white-space: nowrap;
+}
+.patients-count-badge strong {
+  color: var(--color-primary-500);
+}
+
+/* 患者表格 */
+.patients-table-wrap {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 var(--space-8) var(--space-8);
+}
+.patients-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: var(--space-4);
+}
+.patients-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--color-gray-50);
+  padding: 10px 16px;
+  text-align: left;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 1px solid var(--color-gray-200);
+  white-space: nowrap;
+  z-index: 10;
+}
+.patients-table thead th:first-child { border-radius: var(--radius-sm) 0 0 0; padding-left: 20px; }
+.patients-table thead th:last-child  { border-radius: 0 var(--radius-sm) 0 0; }
+.patients-table tbody tr {
+  border-bottom: 1px solid var(--color-gray-100);
+  transition: background var(--transition-fast);
+  cursor: pointer;
+}
+.patients-table tbody tr:hover {
+  background: var(--bg-hover);
+}
+.patients-table tbody td {
+  padding: 14px 16px;
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-700);
+  vertical-align: middle;
+}
+.patients-table tbody td:first-child { padding-left: 20px; }
+.pt-name-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.pt-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, var(--color-primary-400), var(--color-primary-600));
+  color: white;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.pt-avatar.female { background: linear-gradient(135deg, #F472B6, #EC4899); }
+.pt-name-info { display: flex; flex-direction: column; }
+.pt-name { font-weight: var(--font-weight-semibold); color: var(--color-gray-900); }
+.pt-fileno { font-size: var(--font-size-xs); color: var(--color-gray-400); }
+.pt-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 500;
+  margin: 0 2px 2px 0;
+}
+.pt-tag.tag-diabetes { background: #FEF3C7; color: #92400E; }
+.pt-tag.tag-htn      { background: #FEE2E2; color: #991B1B; }
+.pt-tag.tag-elderly  { background: #E0F2FE; color: #075985; }
+.pt-tag.tag-maternal { background: #FCE7F3; color: #9D174D; }
+.pt-tag.tag-default  { background: var(--color-gray-100); color: var(--color-gray-600); }
+.bmi-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+.bmi-badge.obese3    { background: #FEE2E2; color: #B91C1C; }
+.bmi-badge.obese2    { background: #FEE2E2; color: #DC2626; }
+.bmi-badge.obese1    { background: #FEF3C7; color: #B45309; }
+.bmi-badge.overweight{ background: #FEF9C3; color: #854D0E; }
+.bmi-badge.normal    { background: #D1FAE5; color: #065F46; }
+.bmi-badge.thin      { background: #E0F2FE; color: #075985; }
+.pt-type-badge {
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+.pt-type-badge.first  { background: var(--color-primary-50); color: var(--color-primary-600); }
+.pt-type-badge.follow { background: #D1FAE5; color: #065F46; }
+.pt-type-badge.recheck{ background: #FEF3C7; color: #92400E; }
+.pt-row-actions {
+  display: flex;
+  gap: var(--space-2);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+.patients-table tbody tr:hover .pt-row-actions { opacity: 1; }
+.pt-action-btn {
+  padding: 5px 12px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  border: 1px solid var(--color-gray-200);
+  background: white;
+  color: var(--color-gray-600);
+}
+.pt-action-btn:hover { border-color: var(--color-primary-300); color: var(--color-primary-600); background: var(--color-primary-50); }
+.pt-action-btn.primary { background: var(--color-primary-500); color: white; border-color: var(--color-primary-500); }
+.pt-action-btn.primary:hover { background: var(--color-primary-600); }
+
+/* 分页 */
+.patients-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-8);
+  border-top: 1px solid var(--color-gray-100);
+  background: white;
+  flex-shrink: 0;
+}
+.pagination-info { font-size: var(--font-size-sm); color: var(--color-gray-500); }
+.pagination-btns { display: flex; gap: var(--space-2); }
+.pagination-btn {
+  width: 32px; height: 32px;
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-600);
+  background: white;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all var(--transition-fast);
+}
+.pagination-btn:hover { border-color: var(--color-primary-400); color: var(--color-primary-500); }
+.pagination-btn.active { background: var(--color-primary-500); border-color: var(--color-primary-500); color: white; }
+.pagination-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* 统计卡片栏 */
+.patients-stats-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-8);
+  flex-shrink: 0;
+}
+.pt-stat-card {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--color-gray-100);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.pt-stat-icon {
+  width: 44px; height: 44px;
+  border-radius: var(--radius-md);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+}
+.pt-stat-info { flex: 1; }
+.pt-stat-num { font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--color-gray-900); }
+.pt-stat-label { font-size: var(--font-size-xs); color: var(--color-gray-500); }
+
+/* ============================================
+   通用模态弹窗样式
+   ============================================ */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.modal-container {
+  background: white;
+  border-radius: var(--radius-2xl);
+  width: 860px;
+  max-width: 96vw;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-xl);
+  animation: slideUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+}
+.modal-container-md {
+  width: 760px;
+}
+@keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-5) var(--space-6);
+  border-bottom: 1px solid var(--color-gray-100);
+  flex-shrink: 0;
+}
+.modal-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.modal-title-icon {
+  font-size: 22px;
+}
+.modal-title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-gray-900);
+}
+.modal-close-btn {
+  width: 32px; height: 32px;
+  border-radius: var(--radius-full);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  color: var(--color-gray-400);
+  background: var(--color-gray-100);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.modal-close-btn:hover { background: var(--color-gray-200); color: var(--color-gray-700); }
+
+/* 步骤条 */
+.modal-steps {
+  display: flex;
+  align-items: center;
+  padding: var(--space-4) var(--space-6);
+  border-bottom: 1px solid var(--color-gray-100);
+  flex-shrink: 0;
+  background: var(--color-gray-50);
+}
+.modal-step {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.step-num {
+  width: 28px; height: 28px;
+  border-radius: var(--radius-full);
+  border: 2px solid var(--color-gray-300);
+  color: var(--color-gray-400);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  display: flex; align-items: center; justify-content: center;
+  transition: all var(--transition-normal);
+}
+.modal-step.active .step-num {
+  background: var(--color-primary-500);
+  border-color: var(--color-primary-500);
+  color: white;
+}
+.modal-step.done .step-num {
+  background: var(--color-success);
+  border-color: var(--color-success);
+  color: white;
+}
+.step-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-400);
+  font-weight: var(--font-weight-medium);
+  transition: color var(--transition-fast);
+}
+.modal-step.active .step-label { color: var(--color-primary-500); }
+.modal-step.done .step-label { color: var(--color-success); }
+.step-line {
+  flex: 1;
+  height: 2px;
+  background: var(--color-gray-200);
+  margin: 0 var(--space-3);
+  border-radius: var(--radius-full);
+  transition: background var(--transition-normal);
+}
+.step-line.done { background: var(--color-success); }
+
+/* 弹窗主体 */
+.modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-6);
+}
+
+/* 表单分组 */
+.form-step { display: none; }
+.form-step.active { display: block; }
+.form-section-title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray-800);
+  margin-bottom: var(--space-4);
+  padding-bottom: var(--space-2);
+  border-bottom: 2px solid var(--color-primary-100);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.form-hint {
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-400);
+  margin-bottom: var(--space-4);
+  background: var(--color-info-light);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+}
+.form-grid-1 { display: grid; grid-template-columns: 1fr; gap: var(--space-4); margin-bottom: var(--space-4); }
+.form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); margin-bottom: var(--space-4); }
+.form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--space-4); margin-bottom: var(--space-4); }
+.form-group { display: flex; flex-direction: column; gap: var(--space-2); }
+.form-group.required .form-label::after { content: ' *'; color: var(--color-error); }
+.form-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-700);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.form-auto-badge {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary-50);
+  color: var(--color-primary-500);
+  font-weight: 500;
+}
+.form-input, .form-select, .form-textarea {
+  padding: 9px 12px;
+  border: 1.5px solid var(--color-gray-200);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-800);
+  background: white;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  border-color: var(--color-primary-400);
+  box-shadow: 0 0 0 3px rgba(0,34,217,0.08);
+  outline: none;
+}
+.form-input-readonly {
+  background: var(--color-gray-50);
+  color: var(--color-gray-500);
+  cursor: not-allowed;
+}
+.form-textarea { resize: vertical; min-height: 72px; }
+
+/* 单选/标签组 */
+.radio-group {
+  display: flex;
+  gap: var(--space-4);
+  padding: 9px 0;
+}
+.radio-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-700);
+}
+.radio-item input[type="radio"] { accent-color: var(--color-primary-500); }
+.form-tags-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+.tag-checkbox {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 6px 12px;
+  border: 1.5px solid var(--color-gray-200);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-600);
+  transition: all var(--transition-fast);
+  background: white;
+  user-select: none;
+}
+.tag-checkbox:hover { border-color: var(--color-primary-300); background: var(--color-primary-50); color: var(--color-primary-600); }
+.tag-checkbox input[type="checkbox"] { display: none; }
+.tag-checkbox input[type="checkbox"]:checked + span,
+.tag-checkbox:has(input:checked) {
+  color: var(--color-primary-600);
+}
+.tag-checkbox:has(input:checked) {
+  border-color: var(--color-primary-500);
+  background: var(--color-primary-50);
+  color: var(--color-primary-600);
+}
+
+/* 表单汇总预览 */
+.form-summary-card {
+  margin-top: var(--space-6);
+  padding: var(--space-5);
+  background: linear-gradient(135deg, var(--color-primary-50), #F0F4FF);
+  border: 1px solid var(--color-primary-100);
+  border-radius: var(--radius-lg);
+}
+.form-summary-title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary-700);
+  margin-bottom: var(--space-4);
+}
+.form-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+}
+.summary-item { display: flex; flex-direction: column; gap: 2px; }
+.summary-label { font-size: 11px; color: var(--color-gray-500); }
+.summary-value { font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); color: var(--color-gray-800); }
+
+/* 弹窗底部 */
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-6);
+  border-top: 1px solid var(--color-gray-100);
+  flex-shrink: 0;
+  background: var(--color-gray-50);
+}
+.modal-footer-right { display: flex; gap: var(--space-3); align-items: center; }
+
+/* 通用按钮 */
+.btn-primary {
+  padding: 9px 20px;
+  background: var(--color-primary-500);
+  color: white;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  border: none;
+  transition: all var(--transition-fast);
+}
+.btn-primary:hover { background: var(--color-primary-600); box-shadow: 0 4px 12px rgba(0,34,217,0.25); }
+.btn-primary.btn-success { background: var(--color-success); }
+.btn-primary.btn-success:hover { background: #059669; box-shadow: 0 4px 12px rgba(16,185,129,0.3); }
+.btn-secondary {
+  padding: 9px 20px;
+  background: white;
+  color: var(--color-gray-700);
+  border: 1.5px solid var(--color-gray-200);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.btn-secondary:hover { border-color: var(--color-primary-300); color: var(--color-primary-600); }
+.btn-ghost {
+  padding: 9px 16px;
+  background: transparent;
+  color: var(--color-gray-600);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.btn-ghost:hover { background: var(--color-gray-100); color: var(--color-gray-800); }
+.btn-outline {
+  padding: 8px 16px;
+  background: white;
+  color: var(--color-primary-500);
+  border: 1.5px solid var(--color-primary-300);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.btn-outline:hover { background: var(--color-primary-50); }
+.btn-sm { padding: 6px 12px; font-size: var(--font-size-xs); }
+
+/* ============================================
+   批量导入弹窗样式
+   ============================================ */
+
+.import-upload-area {
+  border: 2px dashed var(--color-gray-300);
+  border-radius: var(--radius-xl);
+  padding: var(--space-10);
+  text-align: center;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  background: var(--color-gray-50);
+}
+.import-upload-area:hover, .import-upload-area.dragover {
+  border-color: var(--color-primary-400);
+  background: var(--color-primary-50);
+}
+.import-upload-icon { font-size: 48px; margin-bottom: var(--space-3); }
+.import-upload-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray-700);
+  margin-bottom: var(--space-2);
+}
+.import-upload-subtitle { font-size: var(--font-size-sm); color: var(--color-gray-400); }
+
+.import-template-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--space-5);
+  padding: var(--space-4);
+  background: white;
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-lg);
+}
+.import-template-info { display: flex; align-items: center; gap: var(--space-3); }
+.import-template-icon { font-size: 28px; }
+.import-template-title { font-size: var(--font-size-base); font-weight: var(--font-weight-semibold); color: var(--color-gray-800); }
+.import-template-desc { font-size: var(--font-size-xs); color: var(--color-gray-500); }
+
+.import-field-guide {
+  margin-top: var(--space-5);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.import-field-guide-title {
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-gray-50);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray-700);
+  border-bottom: 1px solid var(--color-gray-200);
+}
+.import-field-table-wrap { overflow-x: auto; }
+.import-field-table { width: 100%; border-collapse: collapse; }
+.import-field-table th {
+  padding: 8px 14px;
+  background: var(--color-gray-50);
+  text-align: left;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray-500);
+  border-bottom: 1px solid var(--color-gray-200);
+}
+.import-field-table td {
+  padding: 8px 14px;
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-700);
+  border-bottom: 1px solid var(--color-gray-100);
+}
+.import-field-table tr:last-child td { border-bottom: none; }
+.required-badge {
+  padding: 2px 8px;
+  background: #FEE2E2;
+  color: #DC2626;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* 预览步骤 */
+.import-preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+.import-preview-stats {
+  display: flex;
+  gap: var(--space-4);
+}
+.import-stat-badge {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+.import-stat-badge.success { background: #D1FAE5; color: #065F46; }
+.import-stat-badge.error   { background: #FEE2E2; color: #991B1B; }
+.import-stat-badge.total   { background: var(--color-primary-50); color: var(--color-primary-700); }
+.import-preview-table-wrap { overflow-x: auto; max-height: 340px; overflow-y: auto; border: 1px solid var(--color-gray-200); border-radius: var(--radius-md); }
+.import-preview-table { width: 100%; border-collapse: collapse; min-width: 700px; }
+.import-preview-table th { padding: 9px 12px; background: var(--color-gray-50); font-size: var(--font-size-xs); font-weight: 600; color: var(--color-gray-600); text-align: left; position: sticky; top: 0; border-bottom: 1px solid var(--color-gray-200); }
+.import-preview-table td { padding: 9px 12px; font-size: var(--font-size-sm); color: var(--color-gray-700); border-bottom: 1px solid var(--color-gray-100); }
+.import-preview-table tr.error-row td { background: #FFF5F5; }
+.import-preview-table tr.error-row .error-cell { color: var(--color-error); font-weight: 500; }
+.import-cell-error { font-size: 11px; color: var(--color-error); margin-top: 2px; }
+
+/* 导入结果 */
+.import-result-wrap {
+  text-align: center;
+  padding: var(--space-10) var(--space-8);
+}
+.import-result-icon { font-size: 64px; margin-bottom: var(--space-4); }
+.import-result-title { font-size: var(--font-size-3xl); font-weight: var(--font-weight-bold); color: var(--color-gray-900); margin-bottom: var(--space-3); }
+.import-result-desc { font-size: var(--font-size-base); color: var(--color-gray-500); }
+.import-result-stats { display: flex; justify-content: center; gap: var(--space-6); margin: var(--space-6) 0; }
+.import-result-stat { display: flex; flex-direction: column; align-items: center; }
+.import-result-stat-num { font-size: var(--font-size-4xl); font-weight: var(--font-weight-bold); }
+.import-result-stat-label { font-size: var(--font-size-sm); color: var(--color-gray-500); }
+
+.import-tip { font-size: var(--font-size-sm); color: var(--color-gray-400); }
+
   flex: 1;
   min-height: 0;
 }
@@ -4775,6 +5503,11 @@ textarea.edit-input {
         <span>健康指导</span>
       </div>
 
+      <div class="nav-item" data-page="patients">
+        <span class="nav-icon">👥</span>
+        <span>患者档案</span>
+      </div>
+
       <div class="nav-section-title">系统</div>
       
       <div class="nav-item" data-page="settings">
@@ -5023,10 +5756,521 @@ textarea.edit-input {
         </div>
       </div>
 
+      <!-- ===== 患者档案页面 ===== -->
+      <div class="page-view" id="page-patients">
+        <div class="page-view-inner" id="patients-list-view">
+          <!-- JS动态渲染 -->
+        </div>
+      </div>
+
     </div><!-- /.page-body -->
   </main>
 
 </div><!-- /.app-layout -->
+
+<!-- ==================== 新建患者档案弹窗 ==================== -->
+<div class="modal-overlay" id="new-patient-modal" style="display:none;">
+  <div class="modal-container" id="new-patient-modal-box">
+    <div class="modal-header">
+      <div class="modal-title-wrap">
+        <span class="modal-title-icon">👤</span>
+        <h2 class="modal-title">新建患者档案</h2>
+      </div>
+      <button class="modal-close-btn" onclick="closeNewPatientModal()">✕</button>
+    </div>
+
+    <!-- 步骤进度条 -->
+    <div class="modal-steps">
+      <div class="modal-step active" data-step="1">
+        <div class="step-num">1</div>
+        <span class="step-label">基本信息</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="modal-step" data-step="2">
+        <div class="step-num">2</div>
+        <span class="step-label">身体数据</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="modal-step" data-step="3">
+        <div class="step-num">3</div>
+        <span class="step-label">健康病史</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="modal-step" data-step="4">
+        <div class="step-num">4</div>
+        <span class="step-label">就诊信息</span>
+      </div>
+    </div>
+
+    <div class="modal-body">
+      <!-- ===== Step 1: 基本信息 ===== -->
+      <div class="form-step active" id="form-step-1">
+        <div class="form-section-title">基本人口学信息</div>
+        <div class="form-grid-2">
+          <div class="form-group required">
+            <label class="form-label">患者姓名</label>
+            <input type="text" class="form-input" id="np-name" placeholder="请输入真实姓名">
+          </div>
+          <div class="form-group required">
+            <label class="form-label">性别</label>
+            <div class="radio-group">
+              <label class="radio-item"><input type="radio" name="np-gender" value="男" checked><span>男</span></label>
+              <label class="radio-item"><input type="radio" name="np-gender" value="女"><span>女</span></label>
+            </div>
+          </div>
+          <div class="form-group required">
+            <label class="form-label">出生日期</label>
+            <input type="date" class="form-input" id="np-birthday">
+          </div>
+          <div class="form-group">
+            <label class="form-label">身份证号</label>
+            <input type="text" class="form-input" id="np-idcard" placeholder="18位身份证号">
+          </div>
+          <div class="form-group required">
+            <label class="form-label">手机号码</label>
+            <input type="tel" class="form-input" id="np-phone" placeholder="用于小程序绑定">
+          </div>
+          <div class="form-group">
+            <label class="form-label">档案编号</label>
+            <input type="text" class="form-input" id="np-fileno" placeholder="留空自动生成">
+          </div>
+          <div class="form-group">
+            <label class="form-label">民族</label>
+            <select class="form-select" id="np-ethnicity">
+              <option value="汉族">汉族</option>
+              <option value="满族">满族</option>
+              <option value="回族">回族</option>
+              <option value="维吾尔族">维吾尔族</option>
+              <option value="苗族">苗族</option>
+              <option value="彝族">彝族</option>
+              <option value="壮族">壮族</option>
+              <option value="其他">其他</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">文化程度</label>
+            <select class="form-select" id="np-education">
+              <option value="小学及以下">小学及以下</option>
+              <option value="初中">初中</option>
+              <option value="高中/中专">高中/中专</option>
+              <option value="大专">大专</option>
+              <option value="本科" selected>本科</option>
+              <option value="硕士及以上">硕士及以上</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">婚姻状况</label>
+            <select class="form-select" id="np-marital">
+              <option value="未婚">未婚</option>
+              <option value="已婚" selected>已婚</option>
+              <option value="离异">离异</option>
+              <option value="丧偶">丧偶</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">职业类型</label>
+            <select class="form-select" id="np-occupation">
+              <option value="脑力劳动">脑力劳动（久坐为主）</option>
+              <option value="轻体力劳动">轻体力劳动</option>
+              <option value="中体力劳动">中体力劳动</option>
+              <option value="重体力劳动">重体力劳动</option>
+              <option value="退休">退休</option>
+              <option value="其他">其他</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-grid-1">
+          <div class="form-group">
+            <label class="form-label">现居住地址</label>
+            <input type="text" class="form-input" id="np-address" placeholder="省市区 + 街道详细地址">
+          </div>
+        </div>
+
+        <div class="form-section-title" style="margin-top:24px;">重点人群标记</div>
+        <div class="form-tags-group" id="np-tags-group">
+          <label class="tag-checkbox"><input type="checkbox" value="老年人"><span>👴 老年人（≥60岁）</span></label>
+          <label class="tag-checkbox"><input type="checkbox" value="孕产妇"><span>🤱 孕产妇</span></label>
+          <label class="tag-checkbox"><input type="checkbox" value="儿童青少年"><span>👦 儿童青少年</span></label>
+          <label class="tag-checkbox"><input type="checkbox" value="糖尿病"><span>💉 合并糖尿病</span></label>
+          <label class="tag-checkbox"><input type="checkbox" value="高血压"><span>❤️ 合并高血压</span></label>
+          <label class="tag-checkbox"><input type="checkbox" value="高脂血症"><span>🩸 高脂血症</span></label>
+          <label class="tag-checkbox"><input type="checkbox" value="冠心病"><span>💊 冠心病</span></label>
+          <label class="tag-checkbox"><input type="checkbox" value="脂肪肝"><span>🫀 脂肪肝</span></label>
+          <label class="tag-checkbox"><input type="checkbox" value="高尿酸血症"><span>🦴 高尿酸血症</span></label>
+          <label class="tag-checkbox"><input type="checkbox" value="睡眠呼吸暂停"><span>😴 睡眠呼吸暂停</span></label>
+          <label class="tag-checkbox"><input type="checkbox" value="产后肥胖"><span>🌸 产后肥胖</span></label>
+          <label class="tag-checkbox"><input type="checkbox" value="多囊卵巢综合征"><span>🩺 多囊卵巢综合征</span></label>
+        </div>
+      </div>
+
+      <!-- ===== Step 2: 身体数据 ===== -->
+      <div class="form-step" id="form-step-2">
+        <div class="form-section-title">基础体格测量</div>
+        <div class="form-grid-3">
+          <div class="form-group required">
+            <label class="form-label">身高 (cm)</label>
+            <input type="number" class="form-input" id="np-height" placeholder="例：170">
+          </div>
+          <div class="form-group required">
+            <label class="form-label">当前体重 (kg)</label>
+            <input type="number" class="form-input" id="np-weight" placeholder="例：85.0" step="0.1">
+          </div>
+          <div class="form-group">
+            <label class="form-label">BMI <span class="form-auto-badge">自动计算</span></label>
+            <input type="text" class="form-input form-input-readonly" id="np-bmi" readonly placeholder="输入身高体重后自动计算">
+          </div>
+          <div class="form-group">
+            <label class="form-label">腰围 (cm)</label>
+            <input type="number" class="form-input" id="np-waist" placeholder="例：95">
+          </div>
+          <div class="form-group">
+            <label class="form-label">臀围 (cm)</label>
+            <input type="number" class="form-input" id="np-hip" placeholder="例：102">
+          </div>
+          <div class="form-group">
+            <label class="form-label">腰臀比 <span class="form-auto-badge">自动计算</span></label>
+            <input type="text" class="form-input form-input-readonly" id="np-whr" readonly placeholder="输入腰围臀围后自动计算">
+          </div>
+          <div class="form-group">
+            <label class="form-label">收缩压 (mmHg)</label>
+            <input type="number" class="form-input" id="np-sbp" placeholder="例：130">
+          </div>
+          <div class="form-group">
+            <label class="form-label">舒张压 (mmHg)</label>
+            <input type="number" class="form-input" id="np-dbp" placeholder="例：85">
+          </div>
+          <div class="form-group">
+            <label class="form-label">心率 (bpm)</label>
+            <input type="number" class="form-input" id="np-hr" placeholder="例：78">
+          </div>
+        </div>
+
+        <div class="form-section-title" style="margin-top:24px;">体成分分析仪数据（可选）</div>
+        <div class="form-hint">💡 如已进行体成分分析，可填写以下数据；如未测量可跳过</div>
+        <div class="form-grid-3">
+          <div class="form-group">
+            <label class="form-label">体脂率 (%)</label>
+            <input type="number" class="form-input" id="np-bfr" placeholder="例：32.5" step="0.1">
+          </div>
+          <div class="form-group">
+            <label class="form-label">骨骼肌量 (kg)</label>
+            <input type="number" class="form-input" id="np-smm" placeholder="例：28.3" step="0.1">
+          </div>
+          <div class="form-group">
+            <label class="form-label">内脏脂肪等级</label>
+            <input type="number" class="form-input" id="np-vfl" placeholder="1-20级">
+          </div>
+          <div class="form-group">
+            <label class="form-label">基础代谢率 (kcal)</label>
+            <input type="number" class="form-input" id="np-bmr" placeholder="例：1680">
+          </div>
+          <div class="form-group">
+            <label class="form-label">体内水分率 (%)</label>
+            <input type="number" class="form-input" id="np-tbw" placeholder="例：52.3" step="0.1">
+          </div>
+          <div class="form-group">
+            <label class="form-label">肌肉量 (kg)</label>
+            <input type="number" class="form-input" id="np-muscle" placeholder="例：55.2" step="0.1">
+          </div>
+        </div>
+
+        <div class="form-section-title" style="margin-top:24px;">减重目标设定</div>
+        <div class="form-grid-3">
+          <div class="form-group">
+            <label class="form-label">目标体重 (kg)</label>
+            <input type="number" class="form-input" id="np-target-weight" placeholder="例：70.0" step="0.1">
+          </div>
+          <div class="form-group">
+            <label class="form-label">目标BMI</label>
+            <input type="number" class="form-input" id="np-target-bmi" placeholder="例：23.0" step="0.1">
+          </div>
+          <div class="form-group">
+            <label class="form-label">计划周期（周）</label>
+            <input type="number" class="form-input" id="np-target-weeks" placeholder="例：12">
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Step 3: 健康病史 ===== -->
+      <div class="form-step" id="form-step-3">
+        <div class="form-section-title">个人史</div>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">吸烟状况</label>
+            <select class="form-select" id="np-smoking">
+              <option value="从不吸烟">从不吸烟</option>
+              <option value="已戒烟">已戒烟</option>
+              <option value="偶尔吸烟">偶尔吸烟（＜5支/天）</option>
+              <option value="轻度吸烟">轻度吸烟（5-10支/天）</option>
+              <option value="中度吸烟">中度吸烟（11-20支/天）</option>
+              <option value="重度吸烟">重度吸烟（＞20支/天）</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">饮酒状况</label>
+            <select class="form-select" id="np-drinking">
+              <option value="不饮酒">不饮酒</option>
+              <option value="偶尔饮酒">偶尔饮酒</option>
+              <option value="少量饮酒">少量饮酒（＜2次/周）</option>
+              <option value="中等饮酒">中等饮酒（3-5次/周）</option>
+              <option value="大量饮酒">大量饮酒（几乎每天）</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">运动习惯</label>
+            <select class="form-select" id="np-exercise-habit">
+              <option value="几乎不运动">几乎不运动</option>
+              <option value="偶尔运动">偶尔运动（每月1-2次）</option>
+              <option value="少量运动">少量运动（每周1-2次）</option>
+              <option value="规律运动">规律运动（每周3-4次）</option>
+              <option value="每天运动">每天运动</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">睡眠质量</label>
+            <select class="form-select" id="np-sleep">
+              <option value="睡眠良好">睡眠良好</option>
+              <option value="轻度失眠">轻度失眠</option>
+              <option value="中度失眠">中度失眠</option>
+              <option value="严重失眠">严重失眠</option>
+              <option value="睡眠过多">睡眠过多（＞9h）</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">肥胖持续时间</label>
+            <select class="form-select" id="np-obese-duration">
+              <option value="">请选择</option>
+              <option value="＜1年">＜1年</option>
+              <option value="1-3年">1-3年</option>
+              <option value="3-5年">3-5年</option>
+              <option value="5-10年">5-10年</option>
+              <option value="＞10年">＞10年</option>
+              <option value="自幼肥胖">自幼肥胖</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">减重意愿</label>
+            <select class="form-select" id="np-motivation">
+              <option value="强烈">强烈（主动求医）</option>
+              <option value="一般">一般（家人建议）</option>
+              <option value="被动">被动（医生建议）</option>
+              <option value="观望">观望中</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-grid-1">
+          <div class="form-group">
+            <label class="form-label">过往减重经历</label>
+            <textarea class="form-textarea" id="np-diet-history" placeholder="例：曾节食减肥3次，最大减重8kg后反弹；曾使用代餐产品2个月…" rows="3"></textarea>
+          </div>
+        </div>
+
+        <div class="form-section-title" style="margin-top:24px;">既往病史</div>
+        <div class="form-grid-1">
+          <div class="form-group">
+            <label class="form-label">既往疾病史</label>
+            <textarea class="form-textarea" id="np-past-disease" placeholder="例：2型糖尿病（2018年确诊）、高血压10年（规律服药）" rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">手术及外伤史</label>
+            <textarea class="form-textarea" id="np-surgery" placeholder="例：2015年阑尾切除术；无外伤史" rows="2"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">过敏史</label>
+            <input type="text" class="form-input" id="np-allergy" placeholder="食物/药物/其他过敏情况，无则填"无"">
+          </div>
+        </div>
+
+        <div class="form-section-title" style="margin-top:24px;">家族病史</div>
+        <div class="form-grid-1">
+          <div class="form-group">
+            <label class="form-label">家族史</label>
+            <textarea class="form-textarea" id="np-family-history" placeholder="例：父亲：高血压、冠心病；母亲：2型糖尿病；无其他家族遗传病史" rows="3"></textarea>
+          </div>
+        </div>
+
+        <div class="form-section-title" style="margin-top:24px;">当前用药情况</div>
+        <div class="form-grid-1">
+          <div class="form-group">
+            <label class="form-label">当前用药</label>
+            <textarea class="form-textarea" id="np-medications" placeholder="例：二甲双胍 0.5g bid、苯磺酸氨氯地平片 5mg qd" rows="3"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Step 4: 就诊信息 ===== -->
+      <div class="form-step" id="form-step-4">
+        <div class="form-section-title">就诊安排</div>
+        <div class="form-grid-2">
+          <div class="form-group required">
+            <label class="form-label">就诊类型</label>
+            <div class="radio-group">
+              <label class="radio-item"><input type="radio" name="np-type" value="初诊" checked><span>初诊</span></label>
+              <label class="radio-item"><input type="radio" name="np-type" value="复诊"><span>复诊</span></label>
+              <label class="radio-item"><input type="radio" name="np-type" value="复查"><span>复查</span></label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">到诊时间</label>
+            <input type="time" class="form-input" id="np-arrive-time" value="09:00">
+          </div>
+          <div class="form-group">
+            <label class="form-label">责任医生</label>
+            <select class="form-select" id="np-doctor">
+              <option value="陈志明">陈志明医生（主治医师）</option>
+              <option value="李华">李华医生（副主任医师）</option>
+              <option value="王芳">王芳医生（住院医师）</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">转介来源</label>
+            <select class="form-select" id="np-referral">
+              <option value="自主就诊">自主就诊</option>
+              <option value="医生转介">医生转介</option>
+              <option value="社区转介">社区卫生中心转介</option>
+              <option value="小程序预约">小程序在线预约</option>
+              <option value="亲友推荐">亲友推荐</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-grid-1">
+          <div class="form-group">
+            <label class="form-label">主诉 / 就诊原因</label>
+            <textarea class="form-textarea" id="np-chief-complaint" placeholder="患者主要诉求和就诊原因，例：体重持续增加3年，近半年增重8kg，要求减重治疗" rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">备注</label>
+            <textarea class="form-textarea" id="np-remark" placeholder="其他需要注意的信息" rows="2"></textarea>
+          </div>
+        </div>
+
+        <!-- 信息汇总预览 -->
+        <div class="form-summary-card" id="np-summary">
+          <div class="form-summary-title">📋 档案信息预览</div>
+          <div class="form-summary-grid" id="np-summary-content">
+            <!-- JS动态填充 -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <div class="modal-footer-left">
+        <button class="btn-secondary" id="np-prev-btn" onclick="npPrevStep()" style="display:none;">← 上一步</button>
+      </div>
+      <div class="modal-footer-right">
+        <button class="btn-ghost" onclick="closeNewPatientModal()">取消</button>
+        <button class="btn-primary" id="np-next-btn" onclick="npNextStep()">下一步 →</button>
+        <button class="btn-primary btn-success" id="np-submit-btn" onclick="submitNewPatient()" style="display:none;">✓ 创建档案</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 批量导入患者弹窗 ==================== -->
+<div class="modal-overlay" id="import-patients-modal" style="display:none;">
+  <div class="modal-container modal-container-md" id="import-patients-modal-box">
+    <div class="modal-header">
+      <div class="modal-title-wrap">
+        <span class="modal-title-icon">📥</span>
+        <h2 class="modal-title">批量导入患者</h2>
+      </div>
+      <button class="modal-close-btn" onclick="closeImportModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <!-- 导入步骤 -->
+      <div class="import-steps-wrap">
+        <div class="import-step-item active" id="import-step-upload">
+          <!-- 上传区域 -->
+          <div class="import-upload-area" id="import-drop-zone" 
+               ondragover="event.preventDefault();this.classList.add('dragover')" 
+               ondragleave="this.classList.remove('dragover')"
+               ondrop="handleImportDrop(event)">
+            <div class="import-upload-icon">📂</div>
+            <div class="import-upload-title">拖拽文件到此区域，或点击选择文件</div>
+            <div class="import-upload-subtitle">支持 Excel (.xlsx / .xls) 和 CSV (.csv) 格式，单次最多500条</div>
+            <input type="file" id="import-file-input" accept=".xlsx,.xls,.csv" style="display:none;" onchange="handleImportFile(this)">
+            <button class="btn-primary" style="margin-top:16px;" onclick="document.getElementById('import-file-input').click()">选择文件</button>
+          </div>
+
+          <!-- 模板下载 -->
+          <div class="import-template-row">
+            <div class="import-template-info">
+              <span class="import-template-icon">📋</span>
+              <div>
+                <div class="import-template-title">下载导入模板</div>
+                <div class="import-template-desc">请按照模板格式填写患者信息，以确保导入成功</div>
+              </div>
+            </div>
+            <button class="btn-outline" onclick="downloadImportTemplate()">⬇️ 下载模板</button>
+          </div>
+
+          <!-- 字段说明 -->
+          <div class="import-field-guide">
+            <div class="import-field-guide-title">📌 模板字段说明</div>
+            <div class="import-field-table-wrap">
+              <table class="import-field-table">
+                <thead>
+                  <tr>
+                    <th>字段名称</th>
+                    <th>是否必填</th>
+                    <th>格式说明</th>
+                    <th>示例</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>姓名</td><td><span class="required-badge">必填</span></td><td>中文/英文姓名</td><td>张伟民</td></tr>
+                  <tr><td>性别</td><td><span class="required-badge">必填</span></td><td>男 / 女</td><td>男</td></tr>
+                  <tr><td>出生日期</td><td><span class="required-badge">必填</span></td><td>YYYY-MM-DD</td><td>1985-06-15</td></tr>
+                  <tr><td>手机号</td><td><span class="required-badge">必填</span></td><td>11位手机号</td><td>13812345678</td></tr>
+                  <tr><td>身份证号</td><td>选填</td><td>18位</td><td>110101198506150011</td></tr>
+                  <tr><td>身高(cm)</td><td><span class="required-badge">必填</span></td><td>数字</td><td>170</td></tr>
+                  <tr><td>体重(kg)</td><td><span class="required-badge">必填</span></td><td>数字，保留1位小数</td><td>85.5</td></tr>
+                  <tr><td>腰围(cm)</td><td>选填</td><td>数字</td><td>95</td></tr>
+                  <tr><td>就诊类型</td><td>选填</td><td>初诊/复诊/复查</td><td>初诊</td></tr>
+                  <tr><td>既往病史</td><td>选填</td><td>文字描述</td><td>2型糖尿病、高血压</td></tr>
+                  <tr><td>当前用药</td><td>选填</td><td>药物名称+剂量</td><td>二甲双胍 0.5g bid</td></tr>
+                  <tr><td>备注</td><td>选填</td><td>其他信息</td><td>—</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 预览/校验步骤 -->
+        <div class="import-step-item" id="import-step-preview" style="display:none;">
+          <div class="import-preview-header">
+            <div class="import-preview-stats" id="import-stats">
+              <!-- JS动态渲染 -->
+            </div>
+            <button class="btn-ghost btn-sm" onclick="resetImport()">重新选择文件</button>
+          </div>
+          <div class="import-preview-table-wrap" id="import-preview-table">
+            <!-- JS动态渲染 -->
+          </div>
+        </div>
+
+        <!-- 导入结果步骤 -->
+        <div class="import-step-item" id="import-step-result" style="display:none;">
+          <div class="import-result-wrap" id="import-result-content">
+            <!-- JS动态渲染 -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <div class="modal-footer-left">
+        <span class="import-tip" id="import-footer-tip">选择文件后可预览数据</span>
+      </div>
+      <div class="modal-footer-right">
+        <button class="btn-ghost" onclick="closeImportModal()">取消</button>
+        <button class="btn-primary" id="import-confirm-btn" onclick="confirmImport()" style="display:none;">✓ 确认导入</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ==================== 完整档案模态页面 ==================== -->
 <div class="full-record-overlay" id="full-record-overlay">
@@ -6495,7 +7739,7 @@ document.addEventListener("DOMContentLoaded", function() {
       document.querySelectorAll(".nav-item[data-page]").forEach(function(n) { n.classList.remove("active"); });
       this.classList.add("active");
       var page = this.getAttribute("data-page");
-      var titles = { dashboard: "首页工作台", guidance: "健康指导", settings: "系统设置" };
+      var titles = { dashboard: "首页工作台", guidance: "健康指导", patients: "患者档案中心", settings: "系统设置" };
       var titleEl = document.querySelector(".page-title");
       if (titleEl && titles[page]) titleEl.textContent = titles[page];
 
@@ -6514,6 +7758,9 @@ document.addEventListener("DOMContentLoaded", function() {
       }
       if (page === "settings") {
         renderSettingsPage();
+      }
+      if (page === "patients") {
+        renderPatientsPage();
       }
     });
   });
@@ -9245,6 +10492,602 @@ function renderFrSportRecord(p) {
   html += '</div>';
   panel.innerHTML = html;
 }
+
+
+// =============================================
+// 患者档案管理 — 完整逻辑
+// =============================================
+
+// ===== 患者档案数据（扩展 patients 对象为档案列表） =====
+var patientArchiveList = [
+  { key: "zhangweimin", name: "张伟民", gender: "男", age: 41, phone: "138****5678", fileNo: "P20260101001",
+    height: 172, weight: 85.0, bmi: 28.7, waist: 96, lastVisit: "2026-04-14", type: "初诊",
+    tags: ["高血压","高脂血症"], doctor: "陈志明", status: "就诊中" },
+  { key: "lixiaohong", name: "李晓红", gender: "女", age: 35, phone: "136****9012", fileNo: "P20260301008",
+    height: 163, weight: 74.5, bmi: 28.0, waist: 88, lastVisit: "2026-04-14", type: "复诊",
+    tags: ["产后肥胖"], doctor: "陈志明", status: "候诊中" },
+  { key: "wangjianguo", name: "王建国", gender: "男", age: 55, phone: "139****3456", fileNo: "P20260215015",
+    height: 170, weight: 95.5, bmi: 33.1, waist: 108, lastVisit: "2026-04-14", type: "复诊",
+    tags: ["老年人","糖尿病","高血压"], doctor: "陈志明", status: "候诊中" },
+  { key: "chenmeiling", name: "陈美玲", gender: "女", age: 28, phone: "137****7890", fileNo: "P20260320022",
+    height: 158, weight: 68.0, bmi: 27.2, waist: 82, lastVisit: "2026-04-10", type: "初诊",
+    tags: ["多囊卵巢综合征"], doctor: "李华", status: "已完成" },
+  { key: "liuqiang", name: "刘强", gender: "男", age: 48, phone: "135****2345", fileNo: "P20260308018",
+    height: 178, weight: 105.0, bmi: 33.1, waist: 116, lastVisit: "2026-04-08", type: "复诊",
+    tags: ["糖尿病","高血压","脂肪肝"], doctor: "陈志明", status: "已完成" },
+  { key: "sunmeimei", name: "孙美美", gender: "女", age: 32, phone: "132****6789", fileNo: "P20260401025",
+    height: 160, weight: 72.0, bmi: 28.1, waist: 86, lastVisit: "2026-04-03", type: "初诊",
+    tags: [], doctor: "王芳", status: "已完成" },
+  { key: "zhoujianping", name: "周建平", gender: "男", age: 62, phone: "133****5432", fileNo: "P20260120009",
+    height: 169, weight: 88.0, bmi: 30.8, waist: 100, lastVisit: "2026-03-28", type: "复查",
+    tags: ["老年人","冠心病","高血压"], doctor: "李华", status: "已完成" },
+  { key: "yangjing", name: "杨静", gender: "女", age: 45, phone: "189****9876", fileNo: "P20260225016",
+    height: 162, weight: 79.5, bmi: 30.3, waist: 94, lastVisit: "2026-03-25", type: "复诊",
+    tags: ["高血压","高脂血症"], doctor: "陈志明", status: "已完成" },
+  { key: "huxiaoming", name: "胡晓明", gender: "男", age: 37, phone: "187****4321", fileNo: "P20260312020",
+    height: 174, weight: 91.0, bmi: 30.1, waist: 102, lastVisit: "2026-03-20", type: "初诊",
+    tags: ["高尿酸血症"], doctor: "王芳", status: "已完成" },
+  { key: "wuying", name: "吴颖", gender: "女", age: 29, phone: "181****3333", fileNo: "P20260405028",
+    height: 165, weight: 70.0, bmi: 25.7, waist: 80, lastVisit: "2026-04-05", type: "初诊",
+    tags: [], doctor: "陈志明", status: "已完成" },
+];
+
+var patientsCurrentPage = 1;
+var patientsPageSize = 8;
+var patientsFilteredList = patientArchiveList.slice();
+
+// ===== 渲染患者档案页面 =====
+function renderPatientsPage() {
+  var container = document.getElementById("patients-list-view");
+  if (!container) return;
+
+  var totalPts = patientArchiveList.length;
+  var todayPts = patientArchiveList.filter(function(p) { return p.lastVisit === "2026-04-14"; }).length;
+  var obesePts = patientArchiveList.filter(function(p) { return p.bmi >= 28; }).length;
+  var managedPts = patientArchiveList.filter(function(p) { return p.type === "复诊" || p.type === "复查"; }).length;
+
+  var html = '';
+
+  // 顶部标题栏
+  html += '<div class="patients-page-header">';
+  html += '  <div class="patients-page-title">患者档案中心</div>';
+  html += '  <div class="patients-page-actions">';
+  html += '    <button class="btn-outline" onclick="openImportModal()">📥 批量导入</button>';
+  html += '    <button class="btn-primary" onclick="openNewPatientModal()">＋ 新建档案</button>';
+  html += '  </div>';
+  html += '</div>';
+
+  // 统计卡片
+  html += '<div class="patients-stats-bar">';
+  html += renderPtStatCard("👥", totalPts, "档案总数", "#E8EAFF");
+  html += renderPtStatCard("📅", todayPts, "今日就诊", "#D1FAE5");
+  html += renderPtStatCard("⚠️", obesePts, "肥胖患者（BMI≥28）", "#FEF3C7");
+  html += renderPtStatCard("🔄", managedPts, "管理中（复诊/复查）", "#DBEAFE");
+  html += '</div>';
+
+  // 搜索筛选栏
+  html += '<div class="patients-filter-bar">';
+  html += '  <div class="patients-search-box">';
+  html += '    <span class="search-icon">🔍</span>';
+  html += '    <input type="text" id="pt-search-input" placeholder="搜索姓名、档案号、手机号..." oninput="filterPatients()" value="">';
+  html += '  </div>';
+  html += '  <select class="filter-select" id="pt-filter-gender" onchange="filterPatients()">';
+  html += '    <option value="">全部性别</option><option value="男">男</option><option value="女">女</option>';
+  html += '  </select>';
+  html += '  <select class="filter-select" id="pt-filter-type" onchange="filterPatients()">';
+  html += '    <option value="">全部类型</option><option value="初诊">初诊</option><option value="复诊">复诊</option><option value="复查">复查</option>';
+  html += '  </select>';
+  html += '  <select class="filter-select" id="pt-filter-doctor" onchange="filterPatients()">';
+  html += '    <option value="">全部医生</option><option value="陈志明">陈志明</option><option value="李华">李华</option><option value="王芳">王芳</option>';
+  html += '  </select>';
+  html += '  <div class="filter-divider"></div>';
+  html += '  <span class="patients-count-badge">共 <strong id="pt-filtered-count">' + patientsFilteredList.length + '</strong> 位患者</span>';
+  html += '</div>';
+
+  // 表格
+  html += '<div class="patients-table-wrap" id="patients-table-wrap">';
+  html += renderPatientsTable();
+  html += '</div>';
+
+  // 分页
+  html += renderPatientsPagination();
+
+  container.innerHTML = html;
+}
+
+function renderPtStatCard(icon, num, label, bgColor) {
+  return '<div class="pt-stat-card">' +
+    '<div class="pt-stat-icon" style="background:' + bgColor + ';">' + icon + '</div>' +
+    '<div class="pt-stat-info">' +
+    '  <div class="pt-stat-num">' + num + '</div>' +
+    '  <div class="pt-stat-label">' + label + '</div>' +
+    '</div></div>';
+}
+
+function renderPatientsTable() {
+  var start = (patientsCurrentPage - 1) * patientsPageSize;
+  var end = start + patientsPageSize;
+  var pageData = patientsFilteredList.slice(start, end);
+
+  var html = '<table class="patients-table"><thead><tr>';
+  html += '<th>患者信息</th><th>性别/年龄</th><th>档案号</th><th>BMI指数</th><th>标签</th><th>就诊类型</th><th>最近就诊</th><th>责任医生</th><th>操作</th>';
+  html += '</tr></thead><tbody>';
+
+  if (pageData.length === 0) {
+    html += '<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--color-gray-400);">暂无符合条件的患者档案</td></tr>';
+  } else {
+    pageData.forEach(function(p) {
+      var bmiInfo = getBmiInfo(p.bmi);
+      var typeClass = p.type === "初诊" ? "first" : (p.type === "复诊" ? "follow" : "recheck");
+      html += '<tr onclick="openFullRecord(\'' + p.key + '\')">';
+      // 姓名
+      html += '<td><div class="pt-name-cell">';
+      html += '<div class="pt-avatar' + (p.gender === "女" ? " female" : "") + '">' + p.name.charAt(0) + '</div>';
+      html += '<div class="pt-name-info"><div class="pt-name">' + p.name + '</div><div class="pt-fileno">' + p.phone + '</div></div>';
+      html += '</div></td>';
+      // 性别年龄
+      html += '<td>' + p.gender + ' · ' + p.age + '岁</td>';
+      // 档案号
+      html += '<td style="font-family:monospace;font-size:12px;color:var(--color-gray-500);">' + p.fileNo + '</td>';
+      // BMI
+      html += '<td><span class="bmi-badge ' + bmiInfo.cls + '">' + p.bmi + ' <span style="font-weight:400;font-size:10px;">' + bmiInfo.label + '</span></span></td>';
+      // 标签
+      html += '<td>';
+      if (p.tags.length === 0) {
+        html += '<span style="color:var(--color-gray-300);font-size:12px;">—</span>';
+      } else {
+        p.tags.slice(0,2).forEach(function(t) {
+          html += '<span class="pt-tag ' + getTagCls(t) + '">' + t + '</span>';
+        });
+        if (p.tags.length > 2) html += '<span class="pt-tag tag-default">+' + (p.tags.length-2) + '</span>';
+      }
+      html += '</td>';
+      // 类型
+      html += '<td><span class="pt-type-badge ' + typeClass + '">' + p.type + '</span></td>';
+      // 最近就诊
+      html += '<td style="color:var(--color-gray-500);font-size:12px;">' + p.lastVisit + '</td>';
+      // 医生
+      html += '<td style="font-size:var(--font-size-sm);">' + p.doctor + '</td>';
+      // 操作
+      html += '<td><div class="pt-row-actions" onclick="event.stopPropagation()">';
+      html += '<button class="pt-action-btn primary" onclick="openFullRecord(\'' + p.key + '\')">查看档案</button>';
+      html += '<button class="pt-action-btn" onclick="openEditPatient(\'' + p.key + '\')">编辑</button>';
+      html += '</div></td>';
+      html += '</tr>';
+    });
+  }
+  html += '</tbody></table>';
+  return html;
+}
+
+function renderPatientsPagination() {
+  var total = patientsFilteredList.length;
+  var totalPages = Math.ceil(total / patientsPageSize);
+  var html = '<div class="patients-pagination">';
+  html += '<div class="pagination-info">共 ' + total + ' 条记录，每页显示 ' + patientsPageSize + ' 条</div>';
+  html += '<div class="pagination-btns">';
+  html += '<button class="pagination-btn" onclick="ptChangePage(' + (patientsCurrentPage-1) + ')" ' + (patientsCurrentPage<=1 ? 'disabled' : '') + '>‹</button>';
+  for (var i = 1; i <= totalPages; i++) {
+    html += '<button class="pagination-btn' + (i===patientsCurrentPage ? ' active' : '') + '" onclick="ptChangePage(' + i + ')">' + i + '</button>';
+  }
+  html += '<button class="pagination-btn" onclick="ptChangePage(' + (patientsCurrentPage+1) + ')" ' + (patientsCurrentPage>=totalPages ? 'disabled' : '') + '>›</button>';
+  html += '</div></div>';
+  return html;
+}
+
+function ptChangePage(page) {
+  var total = patientsFilteredList.length;
+  var totalPages = Math.ceil(total / patientsPageSize);
+  if (page < 1 || page > totalPages) return;
+  patientsCurrentPage = page;
+  var wrap = document.getElementById("patients-table-wrap");
+  if (wrap) wrap.innerHTML = renderPatientsTable();
+  var paginationEl = wrap && wrap.nextElementSibling;
+  if (paginationEl && paginationEl.classList.contains("patients-pagination")) {
+    paginationEl.outerHTML = renderPatientsPagination();
+  }
+}
+
+function filterPatients() {
+  var searchVal = (document.getElementById("pt-search-input") || {value:""}).value.toLowerCase();
+  var genderVal = (document.getElementById("pt-filter-gender") || {value:""}).value;
+  var typeVal = (document.getElementById("pt-filter-type") || {value:""}).value;
+  var doctorVal = (document.getElementById("pt-filter-doctor") || {value:""}).value;
+
+  patientsFilteredList = patientArchiveList.filter(function(p) {
+    var matchSearch = !searchVal ||
+      p.name.toLowerCase().includes(searchVal) ||
+      p.fileNo.toLowerCase().includes(searchVal) ||
+      p.phone.toLowerCase().includes(searchVal);
+    var matchGender = !genderVal || p.gender === genderVal;
+    var matchType = !typeVal || p.type === typeVal;
+    var matchDoctor = !doctorVal || p.doctor === doctorVal;
+    return matchSearch && matchGender && matchType && matchDoctor;
+  });
+
+  patientsCurrentPage = 1;
+  var countEl = document.getElementById("pt-filtered-count");
+  if (countEl) countEl.textContent = patientsFilteredList.length;
+  var wrap = document.getElementById("patients-table-wrap");
+  if (wrap) wrap.innerHTML = renderPatientsTable();
+  var pg = document.querySelector(".patients-pagination");
+  if (pg) pg.outerHTML = renderPatientsPagination();
+}
+
+function getBmiInfo(bmi) {
+  if (bmi >= 37.5) return { cls: "obese3", label: "重度肥胖" };
+  if (bmi >= 32.5) return { cls: "obese2", label: "中度肥胖" };
+  if (bmi >= 27.5) return { cls: "obese1", label: "轻度肥胖" };
+  if (bmi >= 24)   return { cls: "overweight", label: "超重" };
+  if (bmi >= 18.5) return { cls: "normal", label: "正常" };
+  return { cls: "thin", label: "偏瘦" };
+}
+
+function getTagCls(tag) {
+  if (tag === "糖尿病") return "tag-diabetes";
+  if (tag === "高血压") return "tag-htn";
+  if (tag.includes("老年")) return "tag-elderly";
+  if (tag.includes("孕") || tag.includes("产后")) return "tag-maternal";
+  return "tag-default";
+}
+
+// ===== 新建患者弹窗逻辑 =====
+var npCurrentStep = 1;
+var npTotalSteps = 4;
+
+function openNewPatientModal() {
+  npCurrentStep = 1;
+  updateNpStepUI();
+  document.getElementById("new-patient-modal").style.display = "flex";
+  // 重置表单
+  var form = document.getElementById("new-patient-modal-box");
+  if (form) {
+    form.querySelectorAll("input:not([type=radio]):not([type=checkbox]), select, textarea").forEach(function(el) {
+      if (el.id !== "np-arrive-time") el.value = "";
+    });
+    form.querySelectorAll("input[type=checkbox]").forEach(function(cb) { cb.checked = false; });
+  }
+}
+
+function closeNewPatientModal() {
+  document.getElementById("new-patient-modal").style.display = "none";
+}
+
+function npNextStep() {
+  if (!npValidateStep(npCurrentStep)) return;
+  if (npCurrentStep < npTotalSteps) {
+    npCurrentStep++;
+    updateNpStepUI();
+  }
+  if (npCurrentStep === npTotalSteps) {
+    buildNpSummary();
+  }
+}
+
+function npPrevStep() {
+  if (npCurrentStep > 1) {
+    npCurrentStep--;
+    updateNpStepUI();
+  }
+}
+
+function updateNpStepUI() {
+  // 更新步骤条
+  document.querySelectorAll(".modal-step").forEach(function(el) {
+    var s = parseInt(el.getAttribute("data-step"));
+    el.classList.toggle("active", s === npCurrentStep);
+    el.classList.toggle("done", s < npCurrentStep);
+  });
+  document.querySelectorAll(".step-line").forEach(function(el, idx) {
+    el.classList.toggle("done", idx < npCurrentStep - 1);
+  });
+  // 显示/隐藏表单步骤
+  for (var i = 1; i <= npTotalSteps; i++) {
+    var el = document.getElementById("form-step-" + i);
+    if (el) el.classList.toggle("active", i === npCurrentStep);
+  }
+  // 按钮
+  var prevBtn = document.getElementById("np-prev-btn");
+  var nextBtn = document.getElementById("np-next-btn");
+  var submitBtn = document.getElementById("np-submit-btn");
+  if (prevBtn) prevBtn.style.display = npCurrentStep > 1 ? "inline-flex" : "none";
+  if (nextBtn) nextBtn.style.display = npCurrentStep < npTotalSteps ? "inline-flex" : "none";
+  if (submitBtn) submitBtn.style.display = npCurrentStep === npTotalSteps ? "inline-flex" : "none";
+}
+
+function npValidateStep(step) {
+  if (step === 1) {
+    var name = (document.getElementById("np-name") || {value:""}).value.trim();
+    var phone = (document.getElementById("np-phone") || {value:""}).value.trim();
+    if (!name) { alert("请填写患者姓名"); return false; }
+    if (!phone) { alert("请填写手机号码"); return false; }
+  }
+  if (step === 2) {
+    var h = parseFloat((document.getElementById("np-height") || {value:""}).value);
+    var w = parseFloat((document.getElementById("np-weight") || {value:""}).value);
+    if (!h || h < 100 || h > 250) { alert("请填写正确的身高（100~250cm）"); return false; }
+    if (!w || w < 20 || w > 300) { alert("请填写正确的体重（20~300kg）"); return false; }
+  }
+  return true;
+}
+
+// 自动计算BMI和腰臀比
+document.addEventListener("input", function(e) {
+  if (e.target && (e.target.id === "np-height" || e.target.id === "np-weight")) {
+    var h = parseFloat((document.getElementById("np-height") || {value:""}).value);
+    var w = parseFloat((document.getElementById("np-weight") || {value:""}).value);
+    var bmiEl = document.getElementById("np-bmi");
+    if (bmiEl && h > 0 && w > 0) {
+      var bmi = (w / ((h/100) * (h/100))).toFixed(1);
+      bmiEl.value = bmi + " " + getBmiInfo(parseFloat(bmi)).label;
+    }
+  }
+  if (e.target && (e.target.id === "np-waist" || e.target.id === "np-hip")) {
+    var waist = parseFloat((document.getElementById("np-waist") || {value:""}).value);
+    var hip = parseFloat((document.getElementById("np-hip") || {value:""}).value);
+    var whrEl = document.getElementById("np-whr");
+    if (whrEl && waist > 0 && hip > 0) {
+      whrEl.value = (waist / hip).toFixed(2);
+    }
+  }
+});
+
+function buildNpSummary() {
+  var gender = document.querySelector('input[name="np-gender"]:checked');
+  var type = document.querySelector('input[name="np-type"]:checked');
+  var fields = [
+    { label: "患者姓名", id: "np-name" },
+    { label: "性别", val: gender ? gender.value : "" },
+    { label: "出生日期", id: "np-birthday" },
+    { label: "手机号码", id: "np-phone" },
+    { label: "身高(cm)", id: "np-height" },
+    { label: "体重(kg)", id: "np-weight" },
+    { label: "BMI", id: "np-bmi" },
+    { label: "腰围(cm)", id: "np-waist" },
+    { label: "就诊类型", val: type ? type.value : "初诊" },
+    { label: "档案编号", id: "np-fileno", placeholder: "自动生成" },
+    { label: "责任医生", id: "np-doctor" },
+    { label: "既往病史摘要", id: "np-past-disease", maxlen: 30 },
+  ];
+  var html = "";
+  fields.forEach(function(f) {
+    var val = f.val !== undefined ? f.val : "";
+    if (f.id) {
+      var el = document.getElementById(f.id);
+      val = el ? (el.tagName === "SELECT" ? el.options[el.selectedIndex].text : el.value) : "";
+    }
+    if (!val && f.placeholder) val = '<span style="color:var(--color-gray-400);">' + f.placeholder + '</span>';
+    if (f.maxlen && val.length > f.maxlen) val = val.slice(0, f.maxlen) + "…";
+    if (!val) val = '<span style="color:var(--color-gray-300);">—</span>';
+    html += '<div class="summary-item"><div class="summary-label">' + f.label + '</div><div class="summary-value">' + val + '</div></div>';
+  });
+  var summaryEl = document.getElementById("np-summary-content");
+  if (summaryEl) summaryEl.innerHTML = html;
+}
+
+function submitNewPatient() {
+  var name = (document.getElementById("np-name") || {value:""}).value.trim();
+  if (!name) { alert("患者姓名不能为空"); return; }
+
+  // 生成新患者key
+  var newKey = "pt_" + Date.now();
+  var gender = document.querySelector('input[name="np-gender"]:checked');
+  var type = document.querySelector('input[name="np-type"]:checked');
+  var h = parseFloat((document.getElementById("np-height") || {value:"0"}).value);
+  var w = parseFloat((document.getElementById("np-weight") || {value:"0"}).value);
+  var bmi = (h > 0 && w > 0) ? parseFloat((w / ((h/100)*(h/100))).toFixed(1)) : 0;
+  var fileNo = (document.getElementById("np-fileno") || {value:""}).value.trim() ||
+    ("P" + new Date().getFullYear() + String(new Date().getMonth()+1).padStart(2,"0") +
+     String(new Date().getDate()).padStart(2,"0") + String(patientArchiveList.length+1).padStart(3,"0"));
+
+  // 收集标签
+  var tags = [];
+  document.querySelectorAll("#np-tags-group input[type=checkbox]:checked").forEach(function(cb) { tags.push(cb.value); });
+
+  var newPatient = {
+    key: newKey,
+    name: name,
+    gender: gender ? gender.value : "男",
+    age: 0,
+    phone: (document.getElementById("np-phone") || {value:""}).value.trim(),
+    fileNo: fileNo,
+    height: h,
+    weight: w,
+    bmi: bmi,
+    waist: parseFloat((document.getElementById("np-waist") || {value:"0"}).value) || 0,
+    lastVisit: new Date().toISOString().slice(0,10),
+    type: type ? type.value : "初诊",
+    tags: tags,
+    doctor: (() => { var el = document.getElementById("np-doctor"); return el ? el.options[el.selectedIndex].text.split("医生")[0] : "陈志明"; })(),
+    status: "候诊中"
+  };
+
+  patientArchiveList.unshift(newPatient);
+  patientsFilteredList = patientArchiveList.slice();
+  patientsCurrentPage = 1;
+
+  closeNewPatientModal();
+
+  // 刷新列表
+  if (document.getElementById("patients-list-view") && document.getElementById("page-patients").classList.contains("active")) {
+    renderPatientsPage();
+  }
+
+  // 提示
+  showToast("✅ 患者档案「" + name + "」创建成功！档案号：" + fileNo);
+}
+
+function openEditPatient(key) {
+  // 简化：直接打开完整档案编辑
+  openFullRecord(key);
+}
+
+// ===== 批量导入弹窗逻辑 =====
+var importPreviewData = [];
+
+function openImportModal() {
+  document.getElementById("import-patients-modal").style.display = "flex";
+  resetImport();
+}
+
+function closeImportModal() {
+  document.getElementById("import-patients-modal").style.display = "none";
+}
+
+function resetImport() {
+  document.getElementById("import-step-upload").style.display = "block";
+  document.getElementById("import-step-preview").style.display = "none";
+  document.getElementById("import-step-result").style.display = "none";
+  document.getElementById("import-confirm-btn").style.display = "none";
+  document.getElementById("import-footer-tip").textContent = "选择文件后可预览数据";
+  document.getElementById("import-file-input").value = "";
+  importPreviewData = [];
+}
+
+function handleImportDrop(event) {
+  event.preventDefault();
+  var dz = document.getElementById("import-drop-zone");
+  if (dz) dz.classList.remove("dragover");
+  var files = event.dataTransfer.files;
+  if (files.length > 0) processImportFile(files[0]);
+}
+
+function handleImportFile(input) {
+  if (input.files.length > 0) processImportFile(input.files[0]);
+}
+
+function processImportFile(file) {
+  var allowed = [".xlsx", ".xls", ".csv"];
+  var ext = file.name.slice(file.name.lastIndexOf(".")).toLowerCase();
+  if (!allowed.includes(ext)) {
+    alert("不支持的文件格式，请上传 .xlsx / .xls / .csv 文件");
+    return;
+  }
+
+  // 模拟解析：生成10条预览数据
+  importPreviewData = generateMockImportData();
+  showImportPreview();
+}
+
+function generateMockImportData() {
+  var names = ["赵雅琴","刘芳华","孙志强","周美玲","吴晓东","郑慧敏","黄建军","林晓燕","徐志远","马丽娟"];
+  var data = [];
+  for (var i = 0; i < names.length; i++) {
+    var isError = i === 3 || i === 7; // 第4、8条有错误
+    data.push({
+      row: i+2,
+      name: names[i],
+      gender: i % 2 === 0 ? "女" : "男",
+      birthday: "198" + (5+i%5) + "-0" + (i+1) + "-15",
+      phone: "13" + (8+i%2) + "****" + String(1000+i*111).slice(-4),
+      height: 155 + i * 2,
+      weight: 65 + i * 3.5,
+      bmi: parseFloat(((65 + i*3.5) / Math.pow((1.55 + i*0.02), 2)).toFixed(1)),
+      type: i < 3 ? "初诊" : "复诊",
+      disease: i < 5 ? "高血压" : "",
+      error: isError ? (i === 3 ? "手机号格式错误" : "出生日期格式无效") : "",
+      valid: !isError
+    });
+  }
+  return data;
+}
+
+function showImportPreview() {
+  document.getElementById("import-step-upload").style.display = "none";
+  document.getElementById("import-step-preview").style.display = "block";
+
+  var validCount = importPreviewData.filter(function(r) { return r.valid; }).length;
+  var errorCount = importPreviewData.length - validCount;
+
+  var statsHtml = '<div class="import-stat-badge total">📊 共 ' + importPreviewData.length + ' 条</div>';
+  statsHtml += '<div class="import-stat-badge success">✅ 可导入 ' + validCount + ' 条</div>';
+  if (errorCount > 0) statsHtml += '<div class="import-stat-badge error">⚠️ 异常 ' + errorCount + ' 条</div>';
+  document.getElementById("import-stats").innerHTML = statsHtml;
+
+  var tableHtml = '<table class="import-preview-table"><thead><tr>';
+  tableHtml += '<th>行号</th><th>姓名</th><th>性别</th><th>出生日期</th><th>手机号</th><th>身高(cm)</th><th>体重(kg)</th><th>BMI</th><th>就诊类型</th><th>既往病史</th><th>状态</th>';
+  tableHtml += '</tr></thead><tbody>';
+
+  importPreviewData.forEach(function(r) {
+    tableHtml += '<tr class="' + (r.valid ? "" : "error-row") + '">';
+    tableHtml += '<td style="color:var(--color-gray-400);font-size:11px;">行' + r.row + '</td>';
+    tableHtml += '<td class="' + (!r.valid && !r.name ? "error-cell" : "") + '">' + r.name + '</td>';
+    tableHtml += '<td>' + r.gender + '</td>';
+    tableHtml += '<td class="' + (!r.valid && r.error.includes("日期") ? "error-cell" : "") + '">' + r.birthday + (!r.valid && r.error.includes("日期") ? '<div class="import-cell-error">' + r.error + '</div>' : '') + '</td>';
+    tableHtml += '<td class="' + (!r.valid && r.error.includes("手机") ? "error-cell" : "") + '">' + r.phone + (!r.valid && r.error.includes("手机") ? '<div class="import-cell-error">' + r.error + '</div>' : '') + '</td>';
+    tableHtml += '<td>' + r.height + '</td>';
+    tableHtml += '<td>' + r.weight + '</td>';
+    tableHtml += '<td><span class="bmi-badge ' + getBmiInfo(r.bmi).cls + '">' + r.bmi + '</span></td>';
+    tableHtml += '<td>' + r.type + '</td>';
+    tableHtml += '<td>' + (r.disease || '—') + '</td>';
+    tableHtml += '<td>' + (r.valid ? '<span style="color:var(--color-success);">✓</span>' : '<span style="color:var(--color-error);" title="' + r.error + '">✗ 异常</span>') + '</td>';
+    tableHtml += '</tr>';
+  });
+
+  tableHtml += '</tbody></table>';
+  document.getElementById("import-preview-table").innerHTML = tableHtml;
+
+  var confirmBtn = document.getElementById("import-confirm-btn");
+  if (confirmBtn) confirmBtn.style.display = validCount > 0 ? "inline-flex" : "none";
+  var tipEl = document.getElementById("import-footer-tip");
+  if (tipEl) tipEl.textContent = "请检查数据，异常行将跳过不导入";
+}
+
+function confirmImport() {
+  var validData = importPreviewData.filter(function(r) { return r.valid; });
+  var successCount = validData.length;
+  var errorCount = importPreviewData.length - successCount;
+
+  // 将有效数据添加到列表
+  validData.forEach(function(r) {
+    var newKey = "import_" + Date.now() + "_" + r.row;
+    var fileNo = "P" + new Date().getFullYear() + String(patientArchiveList.length+1).padStart(4,"0");
+    patientArchiveList.unshift({
+      key: newKey, name: r.name, gender: r.gender, age: 0,
+      phone: r.phone, fileNo: fileNo, height: r.height, weight: r.weight, bmi: r.bmi,
+      waist: 0, lastVisit: new Date().toISOString().slice(0,10), type: r.type,
+      tags: r.disease ? [r.disease] : [], doctor: "陈志明", status: "已完成"
+    });
+  });
+  patientsFilteredList = patientArchiveList.slice();
+  patientsCurrentPage = 1;
+
+  // 显示结果
+  document.getElementById("import-step-preview").style.display = "none";
+  document.getElementById("import-step-result").style.display = "block";
+  document.getElementById("import-confirm-btn").style.display = "none";
+
+  var resultHtml = '<div class="import-result-icon">🎉</div>';
+  resultHtml += '<div class="import-result-title">导入完成</div>';
+  resultHtml += '<div class="import-result-stats">';
+  resultHtml += '<div class="import-result-stat"><div class="import-result-stat-num" style="color:var(--color-success);">' + successCount + '</div><div class="import-result-stat-label">成功导入</div></div>';
+  if (errorCount > 0) resultHtml += '<div class="import-result-stat"><div class="import-result-stat-num" style="color:var(--color-error);">' + errorCount + '</div><div class="import-result-stat-label">跳过（异常）</div></div>';
+  resultHtml += '<div class="import-result-stat"><div class="import-result-stat-num" style="color:var(--color-primary-500);">' + patientArchiveList.length + '</div><div class="import-result-stat-label">档案总数</div></div>';
+  resultHtml += '</div>';
+  resultHtml += '<div class="import-result-desc">患者档案已成功录入系统，可在档案列表中查看</div>';
+  resultHtml += '<div style="margin-top:24px;"><button class="btn-primary" onclick="closeImportModal();renderPatientsPage();">查看档案列表</button></div>';
+  document.getElementById("import-result-content").innerHTML = resultHtml;
+  document.getElementById("import-footer-tip").textContent = "导入成功";
+
+  showToast("✅ 成功导入 " + successCount + " 位患者档案！");
+}
+
+function downloadImportTemplate() {
+  // 创建CSV内容
+  var csvContent = "\uFEFF姓名,性别,出生日期,手机号,身份证号,身高(cm),体重(kg),腰围(cm),就诊类型,既往病史,当前用药,备注\n";
+  csvContent += "张三,男,1985-06-15,13812345678,110101198506150011,170,85,,初诊,高血压,氨氯地平5mg,\n";
+  csvContent += "李四,女,1990-03-22,13912345678,,162,68,,初诊,,,\n";
+
+  var blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a");
+  a.href = url;
+  a.download = "患者导入模板.csv";
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast("📥 模板下载成功！请按格式填写后上传");
+}
+
 
 </script>
 </body>
